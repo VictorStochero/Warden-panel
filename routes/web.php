@@ -7,6 +7,7 @@ use App\Livewire\Project\Http as ProjectHttp;
 use App\Livewire\Project\Jobs as ProjectJobs;
 use App\Livewire\Project\Schedule as ProjectSchedule;
 use App\Livewire\Project\Show as ProjectShow;
+use App\Livewire\Project\Trace as ProjectTrace;
 use App\Livewire\Project\Traces as ProjectTraces;
 use App\Livewire\Project\Uptime as ProjectUptime;
 use Illuminate\Support\Facades\Route;
@@ -34,6 +35,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/projects/{slug}/schedule', ProjectSchedule::class)->name('project.schedule');
     Route::get('/projects/{slug}/uptime', ProjectUptime::class)->name('project.uptime');
     Route::get('/projects/{slug}/traces', ProjectTraces::class)->name('project.traces');
+    Route::get('/projects/{slug}/traces/{traceId}', ProjectTrace::class)->name('project.trace');
 });
 
 require __DIR__.'/auth.php';

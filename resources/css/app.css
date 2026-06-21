@@ -1,6 +1,73 @@
 @import 'tailwindcss';
 @import '../../vendor/livewire/flux/dist/flux.css';
 
+/* Warden Design System — self-hosted fonts */
+@font-face {
+    font-family: 'Archivo';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('/fonts/archivo-400.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Archivo';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url('/fonts/archivo-500.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Archivo';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url('/fonts/archivo-600.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Archivo';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('/fonts/archivo-700.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Archivo Expanded';
+    font-style: normal;
+    font-weight: 700;
+    font-stretch: 125%;
+    font-display: swap;
+    src: url('/fonts/archivo-expanded-700.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Archivo Expanded';
+    font-style: normal;
+    font-weight: 800;
+    font-stretch: 125%;
+    font-display: swap;
+    src: url('/fonts/archivo-expanded-800.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'JetBrains Mono';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('/fonts/jetbrains-mono-400.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'JetBrains Mono';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url('/fonts/jetbrains-mono-500.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'JetBrains Mono';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url('/fonts/jetbrains-mono-600.woff2') format('woff2');
+}
+
 @source "../views";
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../vendor/livewire/flux-pro/stubs/**/*.blade.php';
@@ -9,7 +76,31 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    /* Warden Design System — typography */
+    --font-sans: 'Archivo', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+    --font-wordmark: 'Archivo Expanded', 'Archivo', sans-serif;
+
+    /* Brand — Beacon Blue */
+    --color-brand-300: #8FB6FF;
+    --color-brand-400: #5B97FF;
+    --color-brand-500: #2E7BFF;
+    --color-brand-600: #1F5FE0;
+    --color-brand-700: #1747AE;
+
+    /* Ink — night surfaces */
+    --color-ink-400: #3C4866;
+    --color-ink-500: #2E3950;
+    --color-ink-600: #2E3950;
+    --color-ink-700: #232C42;
+    --color-ink-750: #1A2235;
+    --color-ink-800: #151C2E;
+    --color-ink-850: #111726;
+    --color-ink-900: #0A0E18;
+    --color-ink-950: #070A12;
+
+    /* Glow shadow */
+    --shadow-glow: 0 0 0 1px rgba(46,123,255,0.18), 0 6px 24px rgba(46,123,255,0.18);
 
     --color-zinc-50: #fafafa;
     --color-zinc-100: #f5f5f5;
@@ -23,16 +114,17 @@
     --color-zinc-900: #171717;
     --color-zinc-950: #0a0a0a;
 
-    --color-accent: var(--color-neutral-800);
-    --color-accent-content: var(--color-neutral-800);
-    --color-accent-foreground: var(--color-white);
+    /* Flux primary controls adopt Beacon Blue */
+    --color-accent: var(--color-brand-500);
+    --color-accent-content: var(--color-brand-400);
+    --color-accent-foreground: #ffffff;
 }
 
 @layer theme {
     .dark {
-        --color-accent: var(--color-white);
-        --color-accent-content: var(--color-white);
-        --color-accent-foreground: var(--color-neutral-800);
+        --color-accent: var(--color-brand-500);
+        --color-accent-content: var(--color-brand-400);
+        --color-accent-foreground: #ffffff;
     }
 }
 
@@ -44,6 +136,11 @@
     ::backdrop,
     ::file-selector-button {
         border-color: var(--color-gray-200, currentColor);
+    }
+
+    /* Warden panel is dark-first — render on the deepest night surface (ink-950) */
+    body {
+        background-color: #070A12;
     }
 }
 

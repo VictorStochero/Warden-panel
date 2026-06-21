@@ -37,6 +37,8 @@ class Show extends Component
             'project' => $project,
             'ranges' => Ranges::all(),
             'kpis' => $dashboard->kpis($project->id, $this->range),
+            'series' => $dashboard->requestSeries($project->id, $this->range),
+            'routes' => $dashboard->topRoutes($project->id, $this->range, 12, false),
         ]);
     }
 }

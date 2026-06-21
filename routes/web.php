@@ -2,6 +2,7 @@
 
 use App\Livewire\Admin\Projects;
 use App\Livewire\Overview;
+use App\Livewire\Project\Database as ProjectDatabase;
 use App\Livewire\Project\Show as ProjectShow;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
@@ -22,6 +23,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/projects', Projects::class)->middleware('can:panel.manage')->name('admin.projects');
 
     Route::get('/projects/{slug}', ProjectShow::class)->name('project.show');
+    Route::get('/projects/{slug}/database', ProjectDatabase::class)->name('project.database');
 });
 
 require __DIR__.'/auth.php';

@@ -18,6 +18,14 @@
                         <flux:navlist.item icon="folder-cog" :href="route('admin.projects')" :current="request()->routeIs('admin.projects')" wire:navigate>Projects</flux:navlist.item>
                     @endcan
                 </flux:navlist.group>
+                @php($slug = request()->route('slug'))
+                @if ($slug)
+                    <flux:navlist.group heading="Project" class="grid">
+                        <flux:navlist.item :href="route('project.show', $slug)" :current="request()->routeIs('project.show')" wire:navigate>Overview</flux:navlist.item>
+                        <flux:navlist.item :href="route('project.database', $slug)" :current="request()->routeIs('project.database')" wire:navigate>Database</flux:navlist.item>
+                        {{-- jobs/http/schedule/uptime items added by their tasks --}}
+                    </flux:navlist.group>
+                @endif
             </flux:navlist>
 
             <flux:spacer />

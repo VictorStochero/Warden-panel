@@ -29,5 +29,8 @@
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
+        <env name="WARDEN_MODE" value="parent"/>
+        <env name="WARDEN_DASHBOARD" value="false"/>
+        <env name="WARDEN_CONNECTION" value=""/>
     </php>
 </phpunit>

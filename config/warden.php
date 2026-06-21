@@ -1,0 +1,598 @@
+<?php
+
+use VictorStochero\Warden\Alerting\Channels\DatabaseAlertChannel;
+use VictorStochero\Warden\Alerting\Channels\DiscordAlertChannel;
+use VictorStochero\Warden\Alerting\Channels\LogAlertChannel;
+use VictorStochero\Warden\Alerting\Channels\MailAlertChannel;
+use VictorStochero\Warden\Alerting\Channels\OpsgenieAlertChannel;
+use VictorStochero\Warden\Alerting\Channels\PagerDutyAlertChannel;
+use VictorStochero\Warden\Alerting\Channels\SlackAlertChannel;
+use VictorStochero\Warden\Alerting\Channels\WebhookAlertChannel;
+use VictorStochero\Warden\Bridge\NullEventForwarder;
+
+return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Mode
+    |--------------------------------------------------------------------------
+    |
+    | A single package, two roles. A "parent" ingests, stores, aggregates and
+    | exposes read contracts. A "child" observes its own lifecycle and ships
+    | event batches to the parent. Nothing else changes between deployments.
+    |
+    */
+
+    'mode' => env('WARDEN_MODE', 'child'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Global kill-switch
+    |--------------------------------------------------------------------------
+    |
+    | A single live switch that disables all capture (child or self-monitoring
+    | parent) without a redeploy. Read at runtime by Warden::capturing(), so the
+    | trace middleware, recorders and flush all go inert the moment it flips —
+    | the host keeps running untouched (RNF-2). Leave true in normal operation;
+    | flip false to stop Warden cold in an incident.
+    |
+    */
+
+    'enabled' => env('WARDEN_ENABLED', true),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Database connection
+    |--------------------------------------------------------------------------
+    |
+    | Warden stores everything in the RDBMS you already run. A dedicated
+    | connection name ("wdn") is recommended so the query recorder can ignore
+    | the package's own traffic (see §18.3). When null, the default connection
+    | is used. The connection itself must point at the same database.
+    |
+    */
+
+    'connection' => env('WARDEN_CONNECTION', null),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Child (observed app)
+    |--------------------------------------------------------------------------
+    */
+
+    'child' => [
+        'parent_url' => env('WARDEN_PARENT_URL'),
+        'project' => env('WARDEN_PROJECT'),
+        'token' => env('WARDEN_TOKEN'),
+        'secret' => env('WARDEN_SECRET'),
+
+        // Release/deploy marker stamped on every event (§5.6) so the parent can
+        // show "errors since this deploy" and flag a regression after one. Set it
+        // in the deploy script (git SHA or tag); falls back to the app version.
+        'release' => env('WARDEN_RELEASE', env('APP_VERSION')),
+
+        // Delivery transport for the outbox. "scheduler" auto-registers
+        // `warden:ship --once` every minute (needs only the scheduler cron).
+        // "daemon" expects a supervised `warden:ship` process instead.
+        'delivery' => env('WARDEN_DELIVERY', 'scheduler'),
+
+        // How often (seconds) an idle shipper polls the parent for control-channel
+        // directives (audit_due, pushed config) when it has nothing to ship — so a
+        // quiet child still receives "Run audit now" and config pushes. A fresh
+        // `warden:ship --once` always polls once; this only throttles the daemon.
+        'poll_interval' => (int) env('WARDEN_POLL_INTERVAL', 60),
+
+        // Let the package auto-register the child schedule (ship --once).
+        'schedule' => ['enabled' => env('WARDEN_CHILD_SCHEDULE', true)],
+
+        // Dependency security audit (composer/npm). When enabled, the child's
+        // scheduler runs `warden:audit` on this cron and ships the result to
+        // the parent. The cron is the "how often" knob.
+        'audit' => [
+            'schedule' => env('WARDEN_AUDIT_SCHEDULE', false),
+            'cron' => env('WARDEN_AUDIT_CRON', '0 3 * * *'), // daily at 03:00
+
+            // Composer binary used by warden:audit. Empty = auto-detect (a robust
+            // search: PATH via ExecutableFinder, common absolute paths, then a
+            // ./composer.phar run with the current PHP). Set when you want to pin it,
+            // e.g. '/usr/local/bin/composer' or 'php /var/www/app/composer.phar'.
+            'composer_bin' => env('WARDEN_COMPOSER_BIN', ''),
+
+            // When no composer binary is reachable (a composer-less Docker runtime,
+            // a PATH-stripped daemon), warden:audit falls back to a binary-free
+            // audit straight from composer.lock + the Packagist advisories API.
+            // This endpoint is what composer audit itself consults; only package
+            // names are sent (no secrets). Set to '' to disable the fallback.
+            'advisories_url' => env('WARDEN_ADVISORIES_URL', 'https://packagist.org/api/security-advisories/'),
+
+            // Timeout (seconds) for the Packagist advisories request.
+            'timeout' => (int) env('WARDEN_AUDIT_TIMEOUT', 20),
+        ],
+
+        // gzip the ship payload (the parent always accepts both, so this is safe
+        // to enable once the parent is on >= 0.3). Worth it for large batches over
+        // a WAN; off by default since the HMAC/decompress path must match.
+        'compress' => env('WARDEN_COMPRESS', false),
+
+        // Where captured batches wait to be shipped. "database" needs no extra
+        // infrastructure; "redis" is an optional accelerator.
+        'outbox' => env('WARDEN_OUTBOX', 'database'),
+
+        // The outbox stops capturing once it reaches this many undelivered
+        // batches, and resumes once the daemon drains it below the low-water
+        // mark. This guarantees RNF-2 without filling the host's disk (§18.6).
+        'outbox_high_water' => env('WARDEN_OUTBOX_HIGH_WATER', 10000),
+        'outbox_low_water' => env('WARDEN_OUTBOX_LOW_WATER', 8000),
+
+        // Logs and exceptions emitted outside any entry-point trace (during boot,
+        // in a long-running custom daemon, or post-terminate) would otherwise be
+        // dropped at record() — they have no trace to correlate to. Ambient
+        // capture rescues them into a synthetic "ambient" trace, shipped at
+        // process shutdown and whenever the ambient buffer crosses flush_threshold
+        // (so a daemon's memory stays flat). Set enabled=false to keep the strict
+        // trace-only behaviour. Only logs/exceptions are rescued; trace-less
+        // queries/cache/etc. (boot noise) stay dropped.
+        'ambient' => [
+            'enabled' => env('WARDEN_AMBIENT', true),
+            'flush_threshold' => (int) env('WARDEN_AMBIENT_FLUSH', 100),
+        ],
+
+        // Recorders to enable. Each maps to a single native Laravel hook.
+        'recorders' => [
+            'request', 'query', 'job', 'exception', 'log', 'mail',
+            'notification', 'cache', 'command', 'schedule', 'http', 'user', 'host',
+        ],
+
+        // A recorder whose listener throws is isolated (the failure never
+        // reaches the host). After this many failures in one process it trips a
+        // breaker and the recorder stops for the rest of the process, which also
+        // prevents a log-storm. Per-process (per Octane worker); reset only on boot.
+        'recorder_breaker_threshold' => (int) env('WARDEN_RECORDER_BREAKER_THRESHOLD', 5),
+
+        // Two-axis sampling (§18.4).
+        'sample' => [
+            // Axis A — head-based trace sampling, decided once per entry point
+            // and carried to downstream jobs so timelines stay whole.
+            'traces' => [
+                'request' => (float) env('WARDEN_SAMPLE_REQUEST', 1.0),
+                'command' => 1.0,
+                'schedule' => 1.0,
+                'job' => (float) env('WARDEN_SAMPLE_JOB', 1.0),
+            ],
+
+            // Tail-based override: always keep traces that errored or were slow.
+            'always_keep' => [
+                'on_exception' => true,
+                'slower_than_ms' => (int) env('WARDEN_ALWAYS_KEEP_MS', 1000),
+            ],
+
+            // Adaptive head sampling (§5.8). Off by default. When enabled, an
+            // error/slow trace raises the effective head rate for the next few
+            // entry points (capture more when something's wrong) and it decays
+            // back to the base rate along the happy path. Per-process, reset on
+            // the Octane/worker boundary. Only meaningful when a base
+            // sample.traces rate is < 1.0.
+            //   boost    — extra rate added on a signal (0..1).
+            //   max_rate — ceiling for the boosted rate.
+            //   decay    — per-decision contraction toward the base (0..1).
+            'adaptive' => [
+                'enabled' => env('WARDEN_ADAPTIVE_SAMPLING', false),
+                'max_rate' => (float) env('WARDEN_ADAPTIVE_MAX_RATE', 1.0),
+                'boost' => (float) env('WARDEN_ADAPTIVE_BOOST', 1.0),
+                'decay' => (float) env('WARDEN_ADAPTIVE_DECAY', 0.5),
+            ],
+
+            // Axis B — global per-type gate. false disables a category entirely.
+            'type_gate' => [
+                'request' => true,
+                'query' => true,
+                'job' => true,
+                'exception' => true,
+                'log' => true,
+                'mail' => true,
+                'notification' => true,
+                'cache' => true,
+                'command' => true,
+                'schedule' => true,
+                'http' => true,
+                'user' => true,
+                'host' => true,
+                'custom' => true,
+            ],
+        ],
+
+        // Query capture threshold (ms). When > 0, the query recorder drops any
+        // query faster than this BEFORE it reaches the buffer — the lean default
+        // profile sets 100 so a fresh install only stores slow SQL. null/0 keeps
+        // every query (full capture), which is what N+1 and frequent-query
+        // analysis need. The parent control plane can set it per project; the
+        // child .env (WARDEN_QUERY_MIN_MS) still wins.
+        'query' => [
+            'capture_min_ms' => env('WARDEN_QUERY_MIN_MS'),
+        ],
+
+        // Keys whose values are redacted from query bindings, request input,
+        // log context, headers and exception messages before anything is
+        // buffered (RNF-4). ADDITIVE to a credential floor enforced in
+        // Support\Scrubber (password, token, secret, authorization, cookie,
+        // api_key, cpf, ssn, credit_card, …), masked by default. The floor can
+        // be lifted only via `capture.disable_credential_scrub` below (off,
+        // discouraged); incidental PII via `capture.pii`. Matching is
+        // case-insensitive and ignores `_`/`-`.
+        'scrub' => [
+            'password', 'password_confirmation', 'passwd', 'token', 'remember_token',
+            'api_token', 'auth_token', 'access_token', 'refresh_token', 'secret', 'client_secret',
+            'api_key', 'private_key', 'authorization', 'bearer', 'cookie',
+            'php-auth-pw', 'csrf', '_token', 'x-api-key', 'credit_card',
+            'card_number', 'cvv', 'ssn', 'cpf',
+        ],
+
+        // Sensitive-data capture (opt-in, private by default). Mirrors Sentry's
+        // send_default_pii: out of the box nothing sensitive is stored; a host
+        // that needs richer diagnostics turns these on, per category. The parent
+        // control plane can set them per project; the child .env still wins.
+        'capture' => [
+            // Preserve incidental PII (emails in messages/bindings, full mail
+            // recipients) as diagnostic signal. Credentials stay masked.
+            'pii' => env('WARDEN_CAPTURE_PII', false),
+
+            // Store the rendered e-mail body (text preferred). Bulk user content.
+            'mail_body' => env('WARDEN_CAPTURE_MAIL_BODY', false),
+
+            // DANGER: drop the credential floor (passwords/tokens/keys/cards).
+            // The only switch that lets raw secrets reach the store — discouraged.
+            'disable_credential_scrub' => env('WARDEN_DISABLE_CREDENTIAL_SCRUB', false),
+        ],
+
+        // How often the host recorder samples /proc, in seconds. Host metrics
+        // are coarse by nature; sampling them on every request is wasteful.
+        'host_interval' => env('WARDEN_HOST_INTERVAL', 15),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Parent (collector / dashboard backend)
+    |--------------------------------------------------------------------------
+    */
+
+    'parent' => [
+        'route_prefix' => env('WARDEN_ROUTE_PREFIX', 'warden'),
+
+        // Self-monitoring: the parent observes itself, writing events straight
+        // into the local database (no HTTP, no outbox — it is the same DB). The
+        // recorders + trace middleware are registered exactly as for a child;
+        // the flush delivers locally through the ingestor instead of shipping.
+        'self_monitor' => env('WARDEN_SELF_MONITOR', true),
+
+        // Slug of the auto-created project the parent records itself under. It is
+        // ensured on `warden:install --parent` and at boot when self-monitoring.
+        'self_project' => env('WARDEN_SELF_PROJECT', 'parent'),
+
+        // Let the package auto-register the parent schedule
+        // (aggregate / evaluate / partition / prune).
+        'schedule' => ['enabled' => env('WARDEN_PARENT_SCHEDULE', true)],
+
+        // Reject non-TLS ingest requests when true. The child→parent channel is
+        // already authenticated (token + HMAC) and replay-protected, but a TLS
+        // tunnel is what keeps the secret and payload confidential on the wire.
+        // Leave false only when the parent sits behind a TLS-terminating proxy
+        // that forwards plain HTTP and you trust that hop.
+        'require_https' => env('WARDEN_REQUIRE_HTTPS', false),
+
+        // Ingestion route protection.
+        'rate_limit' => env('WARDEN_INGEST_RATE_LIMIT', '300,1'), // attempts,perMinutes
+        // Dead-letter is low-volume (only when a child drops a batch after
+        // exhausting retries) — a much tighter cap than ingest, so a misbehaving
+        // child can't pour rows into wdn_dead_letter on the generous ingest bucket.
+        'dead_letter_rate_limit' => env('WARDEN_DEAD_LETTER_RATE_LIMIT', '60,1'),
+        'max_skew' => env('WARDEN_MAX_SKEW', 300), // anti-replay window, seconds
+
+        // Ingest payload guards (DoS protection). A body or event count beyond
+        // these limits is rejected with 413 before any DB work.
+        'max_body_bytes' => env('WARDEN_MAX_BODY_BYTES', 1048576),   // 1 MiB
+        'max_events_per_request' => env('WARDEN_MAX_EVENTS', 5000),
+
+        // Retention. Raw events are short-lived and high-churn; aggregates are
+        // small and kept long. Raw pruning uses DROP PARTITION where supported.
+        'raw_retention_days' => env('WARDEN_RAW_RETENTION_DAYS', 7),
+        'aggregate_retention_days' => env('WARDEN_AGG_RETENTION_DAYS', 90),
+
+        // Dead-letter reports are operational breadcrumbs; reclaim old rows so a
+        // misbehaving child can't grow the table unbounded.
+        'dead_letter_retention_days' => env('WARDEN_DEAD_LETTER_RETENTION_DAYS', 30),
+
+        // Partitioning of wdn_events by date (§18.5). Disabled on SQLite, which
+        // falls back to a single table pruned with DELETE.
+        'partitioning' => env('WARDEN_PARTITIONING', true),
+        'partition_ahead_days' => env('WARDEN_PARTITION_AHEAD', 7),
+
+        // Rollup bucket size in seconds for aggregates (the fine "base" resolution).
+        'bucket_seconds' => env('WARDEN_BUCKET_SECONDS', 60),
+
+        // Multi-resolution rollups (§5.8). Besides the base bucket above, the
+        // aggregator also rolls events into coarser resolutions so a long-window
+        // read (7d/30d) is served by a handful of daily rows instead of thousands
+        // of per-minute rows. Each resolution has its own cursor. Set enabled to
+        // false to keep only the base resolution. `coarse` lists the extra
+        // resolutions in seconds (default: daily).
+        'rollups' => [
+            'enabled' => env('WARDEN_MULTI_RESOLUTION', true),
+            'coarse' => [86400],
+        ],
+
+        // How a "slow" request/query is classified in rollups, milliseconds.
+        'slow_request_ms' => env('WARDEN_SLOW_REQUEST_MS', 1000),
+        'slow_query_ms' => env('WARDEN_SLOW_QUERY_MS', 100),
+
+        // Query health analysis thresholds (§ database section).
+        // n_plus_one_threshold: min repetitions of the same SQL pattern within a
+        //   trace to flag it as N+1 (matches NPlusOneDetector's default).
+        // fat_request_queries: total queries in one trace that qualifies as "fat".
+        // query_health_sample: how many recent query events to analyse per render.
+        'n_plus_one_threshold' => env('WARDEN_N_PLUS_ONE_THRESHOLD', 3),
+        'fat_request_queries' => env('WARDEN_FAT_REQUEST_QUERIES', 50),
+        'query_health_sample' => env('WARDEN_QUERY_HEALTH_SAMPLE', 2000),
+
+        // New-version notice. The parent checks Packagist for a newer STABLE
+        // release of the package and surfaces a discreet banner in the dashboard.
+        // Toggle lives in the dashboard (wdn_settings); WARDEN_VERSION_CHECK is
+        // the .env override that wins. The check runs on the parent schedule, is
+        // fully best-effort (a network failure leaves no notice and never throws),
+        // and only package names — nothing sensitive — leave the host.
+        'version_check' => [
+            'enabled' => env('WARDEN_VERSION_CHECK', true),
+            'include_prereleases' => env('WARDEN_VERSION_CHECK_PRERELEASES', false),
+            'ttl_hours' => (int) env('WARDEN_VERSION_CHECK_TTL', 24),
+            'timeout' => (int) env('WARDEN_VERSION_CHECK_TIMEOUT', 10),
+            'url' => env('WARDEN_VERSION_CHECK_URL', 'https://repo.packagist.org/p2/victorstochero/warden.json'),
+            'changelog_url' => env('WARDEN_CHANGELOG_URL', 'https://github.com/victorstochero/warden/releases'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Alerting
+    |--------------------------------------------------------------------------
+    |
+    | Channels are internal and pluggable. No external channel is bundled — the
+    | defaults persist to the database and write to a dedicated log channel.
+    | Add your own by implementing VictorStochero\Warden\Contracts\AlertChannel.
+    |
+    */
+
+    'alerts' => [
+        'cooldown' => env('WARDEN_ALERT_COOLDOWN', 300), // seconds between repeat alerts per subject
+
+        // E-mail alerts. Managed from the dashboard (Settings -> Alerts): a
+        // global toggle + recipients, with an optional per-project override.
+        // Uses the parent app's configured mailer (config/mail.php / .env) — no
+        // external service of its own (RNF-3). WARDEN_ALERT_EMAILS remains a
+        // legacy fallback when the database list is empty.
+        'mail' => [
+            'to' => array_values(array_filter(array_map(
+                'trim',
+                explode(',', (string) env('WARDEN_ALERT_EMAILS', ''))
+            ))),
+        ],
+
+        // Chat / webhook channels (§5.5). Each is config-driven by a webhook URL
+        // and self-silences when unset, so they're safe to leave registered. The
+        // outbound POST runs suppressed (§18.3) and is best-effort (never throws).
+        // `min_severity` (info|warning|critical) floors what each one forwards.
+        'slack' => [
+            'webhook_url' => env('WARDEN_ALERT_SLACK_WEBHOOK'),
+            'min_severity' => env('WARDEN_ALERT_SLACK_MIN_SEVERITY', 'warning'),
+        ],
+        'discord' => [
+            'webhook_url' => env('WARDEN_ALERT_DISCORD_WEBHOOK'),
+            'min_severity' => env('WARDEN_ALERT_DISCORD_MIN_SEVERITY', 'warning'),
+        ],
+        'webhook' => [
+            'url' => env('WARDEN_ALERT_WEBHOOK_URL'),
+            'min_severity' => env('WARDEN_ALERT_WEBHOOK_MIN_SEVERITY', 'warning'),
+        ],
+
+        // On-call paging (§5.5). Unlike the chat channels these hit a fixed API
+        // endpoint with a credential and map opened/resolved to the provider's
+        // trigger/resolve verbs (PagerDuty Events API v2, Opsgenie Alerts API).
+        // Both self-silence without their credential and default to a `critical`
+        // floor so they only page on real incidents.
+        'pagerduty' => [
+            'routing_key' => env('WARDEN_ALERT_PAGERDUTY_ROUTING_KEY'),
+            'endpoint' => env('WARDEN_ALERT_PAGERDUTY_ENDPOINT', 'https://events.pagerduty.com/v2/enqueue'),
+            'min_severity' => env('WARDEN_ALERT_PAGERDUTY_MIN_SEVERITY', 'critical'),
+        ],
+        'opsgenie' => [
+            'api_key' => env('WARDEN_ALERT_OPSGENIE_API_KEY'),
+            'endpoint' => env('WARDEN_ALERT_OPSGENIE_ENDPOINT', 'https://api.opsgenie.com/v2/alerts'),
+            'min_severity' => env('WARDEN_ALERT_OPSGENIE_MIN_SEVERITY', 'critical'),
+        ],
+
+        // Threshold rules (§5.5). Each compares a KPI over a window against a
+        // threshold and opens/resolves a `rule:<name>` incident through the
+        // channels below. Empty by default. Example:
+        //   ['name' => 'error-rate', 'metric' => 'error_rate', 'op' => '>', 'threshold' => 5, 'window' => '1h', 'severity' => 'critical'],
+        // metric ∈ error_rate | p95 | throughput | errors | slow | failed_jobs | cache_hit_rate
+        // op ∈ > | >= | < | <= | anomaly   ·   window ∈ 15m | 1h | 6h | 24h | 7d
+        // With op 'anomaly', `threshold` is the number of standard deviations
+        // above the moving baseline that trips the rule (default 3). Anomaly
+        // supports the request-derived metrics: throughput | errors | p95 | error_rate.
+        'rules' => [],
+
+        // MailAlertChannel is registered unconditionally; it self-silences when
+        // e-mail alerts are disabled or unconfigured (see Settings -> Alerts).
+        // The chat/webhook channels likewise self-silence without a URL.
+        'channels' => [
+            DatabaseAlertChannel::class,
+            LogAlertChannel::class,
+            MailAlertChannel::class,
+            SlackAlertChannel::class,
+            DiscordAlertChannel::class,
+            WebhookAlertChannel::class,
+            PagerDutyAlertChannel::class,
+            OpsgenieAlertChannel::class,
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Bridge (§9.2)
+    |--------------------------------------------------------------------------
+    |
+    | Optional post-ingest forwarder seam. After the parent persists a batch into
+    | wdn_events it hands the same canonical (schema_version 2) events to this
+    | forwarder, so a satellite package can re-emit them downstream (e.g. an OTLP
+    | exporter to a columnar SaaS for overflow/mirror) WITHOUT touching the core.
+    |
+    | Default is the no-op NullEventForwarder: zero overhead, no runtime dep — the
+    | "zero-dep until you opt in" contract. Point `forwarder` at a class
+    | implementing VictorStochero\Warden\Contracts\EventForwarder to enable it. A
+    | host can also subscribe to the EventsIngested event instead.
+    |
+    */
+
+    'bridge' => [
+        'forwarder' => env('WARDEN_BRIDGE_FORWARDER', NullEventForwarder::class),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Dashboard
+    |--------------------------------------------------------------------------
+    |
+    | A self-contained Blade + Tailwind (CDN, no build step) UI served on the
+    | parent under the route prefix. It reads exclusively through the read
+    | layer — no UI library, no extra Composer/NPM package (RNF-6). Access is
+    | gated by the "viewWarden" ability; define it in a service provider to
+    | open it beyond the local environment.
+    |
+    */
+
+    'dashboard' => [
+        'enabled' => env('WARDEN_DASHBOARD', true),
+
+        // Real-time transport (§5.4). 'poll' (default) is the universal
+        // cursor-based conditional GET (304 when idle) — zero-dep, runs on plain
+        // PHP-FPM. 'sse' upgrades to a single Server-Sent-Events connection per
+        // viewer (one long-lived worker each), best paired with Octane or a
+        // dedicated process. The payload is identical for both, so the same
+        // frontend renders either.
+        'transport' => env('WARDEN_DASHBOARD_TRANSPORT', 'poll'),
+        'sse' => [
+            // Safety bounds for the SSE loop: how many ticks before the stream
+            // closes (the client reconnects), and the gap between ticks.
+            'max_ticks' => (int) env('WARDEN_SSE_MAX_TICKS', 600),
+            'interval_ms' => (int) env('WARDEN_SSE_INTERVAL_MS', 3000),
+        ],
+
+        // The middleware group wrapping the dashboard AND the built-in login
+        // routes. In the "password" auth mode below this MUST include session +
+        // CSRF protection — i.e. StartSession + VerifyCsrfToken, normally bundled
+        // in Laravel's `web` group. Stripping them silently disables CSRF on the
+        // login/admin POSTs; Warden logs a boot warning if it detects this.
+        //
+        // SECURITY (#11): when an operator creates / rotates / recovers a child's
+        // credentials, the decrypted child SECRET is flashed to the session once
+        // so the setup snippet can be shown a single time on the next page. With
+        // SESSION_DRIVER=cookie that one-shot value is written into the (signed,
+        // but client-held) session cookie. For this parent prefer a server-side
+        // session store (SESSION_DRIVER=database/redis/file) so the secret never
+        // leaves the server, and run the dashboard over HTTPS.
+        'middleware' => ['web'],
+        // Auto-refresh interval for live pages, in seconds (0 disables).
+        'refresh' => env('WARDEN_DASHBOARD_REFRESH', 15),
+
+        // Dashboard UI language. `locale` is the instance default used when the
+        // viewer has no `warden_locale` cookie and the browser's Accept-Language
+        // matches none of `locales`. `locales` is the allow-list offered in the
+        // sidebar switcher (single source of truth for middleware + route + UI).
+        'locale' => env('WARDEN_LOCALE', 'en'),
+        'locales' => ['en', 'pt_BR', 'es'],
+
+        /*
+        |----------------------------------------------------------------------
+        | Access
+        |----------------------------------------------------------------------
+        |
+        | How the dashboard authorizes viewers and managers, selectable from the
+        | .env with no code required:
+        |
+        |   password — a built-in login form (independent of the host app's user
+        |              system). WARDEN_DASHBOARD_PASSWORD grants view access;
+        |              WARDEN_DASHBOARD_ADMIN_PASSWORD grants the management
+        |              actions (manageWarden). Fail-closed: without an admin
+        |              password set, every login is viewer-only — configure the
+        |              admin password to grant management. Ideal for a dedicated
+        |              parent app.
+        |   email    — uses the host app's authenticated user. An e-mail in
+        |              WARDEN_DASHBOARD_EMAILS gets view access; one in
+        |              WARDEN_DASHBOARD_ADMIN_EMAILS gets management. Fail-closed:
+        |              with no admin allowlist, nobody manages.
+        |   gate     — advanced: the host defines viewWarden / manageWarden gates
+        |              in a service provider. Default-deny: outside local nobody
+        |              passes; in local only an authenticated host user may VIEW,
+        |              and management is never granted by environment alone.
+        |
+        | When `mode` is empty it resolves to `password` if a dashboard password
+        | is set, otherwise `gate` (local-only) — the historical behaviour.
+        |
+        */
+
+        'auth' => [
+            'mode' => env('WARDEN_DASHBOARD_AUTH'),
+
+            // password mode
+            'password' => env('WARDEN_DASHBOARD_PASSWORD'),
+            'admin_password' => env('WARDEN_DASHBOARD_ADMIN_PASSWORD'),
+
+            // email mode (comma-separated lists)
+            'emails' => array_values(array_filter(array_map(
+                'trim',
+                explode(',', (string) env('WARDEN_DASHBOARD_EMAILS', ''))
+            ))),
+            'admin_emails' => array_values(array_filter(array_map(
+                'trim',
+                explode(',', (string) env('WARDEN_DASHBOARD_ADMIN_EMAILS', ''))
+            ))),
+
+            /*
+            |------------------------------------------------------------------
+            | Brute-force throttle (password mode)
+            |------------------------------------------------------------------
+            |
+            | Built-in, zero-dependency rate limiting for the login form: after
+            | `max_attempts` failed passwords from one IP within `decay` seconds,
+            | further attempts are blocked until the window expires. A successful
+            | login clears the counter. Only the "password" mode has its own form;
+            | email/gate modes delegate auth to the host app.
+            |
+            | NOTE: the per-IP key uses $request->ip(), which is only trustworthy
+            | when the host's TrustProxies is configured correctly (no wildcard /
+            | only your real proxy trusted). Under a permissive proxy config a
+            | client can rotate X-Forwarded-For to mint fresh per-IP buckets — the
+            | IP-independent `login_global_max` cap below is the control that still
+            | holds in that case.
+            |
+            */
+            'throttle' => [
+                'max_attempts' => (int) env('WARDEN_LOGIN_MAX_ATTEMPTS', 5),
+                'decay' => (int) env('WARDEN_LOGIN_DECAY', 60),
+            ],
+
+            /*
+            |------------------------------------------------------------------
+            | Global login cap (password mode)
+            |------------------------------------------------------------------
+            |
+            | An absolute, IP-independent ceiling on failed login attempts per
+            | decay window. The per-IP throttle above can be multiplied by a
+            | distributed attacker rotating IPs; this aggregate counter blocks
+            | the form once total failures cross `login_global_max`, no matter
+            | the source. Set to 0 to disable the global cap.
+            |
+            */
+            'login_global_max' => (int) env('WARDEN_LOGIN_GLOBAL_MAX', 100),
+        ],
+    ],
+
+];

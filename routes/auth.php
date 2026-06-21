@@ -8,8 +8,10 @@ Route::middleware('guest')->group(function () {
     Volt::route('login', 'auth.login')
         ->name('login');
 
-    Volt::route('register', 'auth.register')
-        ->name('register');
+    // Public registration is disabled for this self-hosted fleet panel.
+    // Bootstrap the first admin with: php artisan panel:make-admin
+    // Volt::route('register', 'auth.register')
+    //     ->name('register');
 
     Volt::route('forgot-password', 'auth.forgot-password')
         ->name('password.request');

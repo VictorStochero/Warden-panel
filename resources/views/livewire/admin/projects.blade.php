@@ -6,10 +6,10 @@
         <flux:button type="submit" variant="primary">Create + mint credentials</flux:button>
     </form>
 
-    @if ($snippet)
+    @if (session('warden_new_credentials'))
         <flux:callout variant="warning">
             <flux:heading>Copy this now — the secret is shown only once.</flux:heading>
-            <pre class="font-mono text-sm whitespace-pre-wrap">{{ $snippet }}</pre>
+            <pre class="font-mono text-sm whitespace-pre-wrap">{{ session('warden_new_credentials')['snippet'] }}</pre>
         </flux:callout>
     @endif
 

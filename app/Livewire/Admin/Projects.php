@@ -11,9 +11,6 @@ use VictorStochero\Warden\Models\Project;
 class Projects extends Component
 {
     public string $name = '';
-    public ?string $newToken = null;
-    public ?string $newSecret = null;
-    public ?string $snippet = null;
 
     public function mount(): void
     {
@@ -28,14 +25,19 @@ class Projects extends Component
         $result = $projects->create($this->name);
         $project = $result['project'];
 
-        $this->newToken = $result['token'];
-        $this->newSecret = $result['secret'];
-        $this->snippet = $projects->envSnippet(
+        $snippet = $projects->envSnippet(
             $project->slug,
             $result['token'],
             $result['secret'],
             rtrim(config('app.url'), '/'),
         );
+
+        session()->flash('warden_new_credentials', [
+            'token' => $result['token'],
+            'secret' => $result['secret'],
+            'snippet' => $snippet,
+        ]);
+
         $this->name = '';
     }
 

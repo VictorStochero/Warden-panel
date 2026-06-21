@@ -1,18 +1,17 @@
 <?php
 
 use App\Livewire\Admin\Projects;
+use App\Livewire\Overview;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
-
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('/', Overview::class)->name('home');
+
     Route::redirect('settings', 'settings/profile');
 
     Volt::route('settings/profile', 'settings.profile')->name('settings.profile');

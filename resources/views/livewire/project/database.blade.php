@@ -9,11 +9,56 @@
 
     <div class="rounded-xl bg-ink-850 p-4">
         <flux:heading size="lg" class="mb-3">Query health</flux:heading>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 font-mono text-sm">
-            @foreach ($queryHealth as $label => $value)
-                <div><span class="text-slate-400">{{ $label }}:</span> {{ is_scalar($value) ? $value : json_encode($value) }}</div>
+        <p class="text-sm text-slate-400 mb-4">Sampled {{ $queryHealth['sampled'] }} of up to {{ $queryHealth['limit'] }} queries.</p>
+
+        @php($labels = [
+            'n_plus_one'  => 'N+1 queries',
+            'duplicates'  => 'Duplicate queries',
+            'select_star' => 'SELECT *',
+            'no_where'    => 'UPDATE/DELETE without WHERE',
+            'fat_requests'=> 'Fat requests',
+            'slow'        => 'Slow queries',
+        ])
+
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+            @foreach ($labels as $key => $label)
+                @php($entries = $queryHealth['findings'][$key] ?? [])
+                @php($cnt = count($entries))
+                <div class="rounded-lg bg-ink-900 p-3">
+                    <div class="text-xs text-slate-400 mb-1">{{ $label }}</div>
+                    <div class="text-2xl font-semibold {{ $cnt > 0 ? 'text-amber-400' : 'text-slate-300' }}">{{ $cnt }}</div>
+                </div>
             @endforeach
         </div>
+
+        @foreach (['n_plus_one' => 'N+1 queries', 'duplicates' => 'Duplicate queries', 'slow' => 'Slow queries'] as $key => $label)
+            @php($entries = $queryHealth['findings'][$key] ?? [])
+            @if (count($entries) > 0)
+                <div class="mb-4">
+                    <div class="text-sm font-medium text-slate-300 mb-2">{{ $label }}</div>
+                    <flux:table>
+                        <flux:table.columns>
+                            <flux:table.column>Query</flux:table.column>
+                            <flux:table.column>{{ $key === 'slow' ? 'Duration' : 'Count' }}</flux:table.column>
+                        </flux:table.columns>
+                        <flux:table.rows>
+                            @foreach (array_slice($entries, 0, 5) as $i => $entry)
+                                <flux:table.row wire:key="health-{{ $key }}-{{ $i }}">
+                                    <flux:table.cell class="font-mono text-xs max-w-md truncate">{{ $entry['sql'] ?? '' }}</flux:table.cell>
+                                    <flux:table.cell class="{{ $key === 'slow' ? 'text-rose-400' : 'text-amber-400' }} text-xs">
+                                        @if ($key === 'slow')
+                                            {{ round(($entry['duration_us'] ?? 0) / 1000) }}ms
+                                        @else
+                                            {{ $entry['count'] ?? '' }}
+                                        @endif
+                                    </flux:table.cell>
+                                </flux:table.row>
+                            @endforeach
+                        </flux:table.rows>
+                    </flux:table>
+                </div>
+            @endif
+        @endforeach
     </div>
 
     @php($tables = [['Slowest queries', $slowQueries], ['Most frequent queries', $frequentQueries]])

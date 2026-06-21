@@ -3,6 +3,7 @@
 use App\Livewire\Admin\Projects;
 use App\Livewire\Overview;
 use App\Livewire\Project\Database as ProjectDatabase;
+use App\Livewire\Project\Http as ProjectHttp;
 use App\Livewire\Project\Jobs as ProjectJobs;
 use App\Livewire\Project\Show as ProjectShow;
 use Illuminate\Support\Facades\Route;
@@ -26,6 +27,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/projects/{slug}', ProjectShow::class)->name('project.show');
     Route::get('/projects/{slug}/database', ProjectDatabase::class)->name('project.database');
     Route::get('/projects/{slug}/jobs', ProjectJobs::class)->name('project.jobs');
+    Route::get('/projects/{slug}/http', ProjectHttp::class)->name('project.http');
 });
 
 require __DIR__.'/auth.php';

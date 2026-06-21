@@ -5,6 +5,7 @@ use App\Livewire\Overview;
 use App\Livewire\Project\Database as ProjectDatabase;
 use App\Livewire\Project\Http as ProjectHttp;
 use App\Livewire\Project\Issue as ProjectIssue;
+use App\Livewire\Project\Incidents as ProjectIncidents;
 use App\Livewire\Project\Issues as ProjectIssues;
 use App\Livewire\Project\Jobs as ProjectJobs;
 use App\Livewire\Project\Schedule as ProjectSchedule;
@@ -40,6 +41,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/projects/{slug}/traces/{traceId}', ProjectTrace::class)->name('project.trace');
     Route::get('/projects/{slug}/issues', ProjectIssues::class)->name('project.issues');
     Route::get('/projects/{slug}/issues/{issueId}', ProjectIssue::class)->name('project.issue');
+    Route::get('/projects/{slug}/incidents', ProjectIncidents::class)->name('project.incidents');
 });
 
 require __DIR__.'/auth.php';

@@ -2,6 +2,7 @@
 
 use App\Livewire\Admin\Projects;
 use App\Livewire\Overview;
+use App\Livewire\Project\Show as ProjectShow;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
@@ -19,6 +20,8 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
 
     Route::get('/admin/projects', Projects::class)->middleware('can:panel.manage')->name('admin.projects');
+
+    Route::get('/projects/{slug}', ProjectShow::class)->name('project.show');
 });
 
 require __DIR__.'/auth.php';

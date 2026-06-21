@@ -24,10 +24,17 @@ class Trace extends Component
     public function render(DashboardRepository $dashboard)
     {
         $project = $dashboard->project($this->slug);
-        $spans = $dashboard->trace($project->id, $this->traceId);
+        $projects = $dashboard->traceProjects($this->traceId);
+        $distributed = $projects->count() > 1;
+
+        $spans = $distributed
+            ? $dashboard->distributedTrace($this->traceId, $projects)
+            : $dashboard->trace($project->id, $this->traceId);
 
         return view('livewire.project.trace', [
             'project' => $project,
+            'projects' => $projects,
+            'distributed' => $distributed,
             'rows' => Waterfall::rows($spans),
         ]);
     }

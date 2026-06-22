@@ -29,9 +29,20 @@ class PanelDidacticChannel implements AlertChannel
             $text = strtoupper($event)."\n".$this->composer->text($msg);
 
             $this->toWebhook($text);
-            $this->toEmail($incident, $msg, $text, $event);
+            $this->emailRaw($text, "[Warden] {$event}: {$msg['title']} · {$msg['project']}", $incident->severity);
         } catch (Throwable) {
             // Alerting is best-effort.
+        }
+    }
+
+    /** Deliver an arbitrary didactic message (e.g. a digest) over the same transports. */
+    public function deliver(string $text, string $subject, string $severity = 'info'): void
+    {
+        try {
+            $this->toWebhook($text);
+            $this->emailRaw($text, $subject, $severity);
+        } catch (Throwable) {
+            // best-effort
         }
     }
 
@@ -51,8 +62,7 @@ class PanelDidacticChannel implements AlertChannel
         }
     }
 
-    /** @param array<string, mixed> $msg */
-    private function toEmail(Incident $incident, array $msg, string $text, string $event): void
+    private function emailRaw(string $text, string $subject, string $severity): void
     {
         $settings = AlertSetting::current();
         $recipients = $settings->recipients ?? [];
@@ -60,13 +70,13 @@ class PanelDidacticChannel implements AlertChannel
         if (! $settings->email_enabled || $recipients === []) {
             return;
         }
-        if (! $this->severityAllowed($incident->severity, $settings->min_severity)) {
+        if (! $this->severityAllowed($severity, $settings->min_severity)) {
             return;
         }
 
         try {
-            Mail::raw($text, function (Message $message) use ($recipients, $event, $msg): void {
-                $message->to($recipients)->subject("[Warden] {$event}: {$msg['title']} · {$msg['project']}");
+            Mail::raw($text, function (Message $message) use ($recipients, $subject): void {
+                $message->to($recipients)->subject($subject);
             });
         } catch (Throwable) {
             // ignore

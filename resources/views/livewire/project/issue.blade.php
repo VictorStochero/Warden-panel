@@ -11,6 +11,18 @@
         </div>
     </div>
 
+    @if ($whereToFix)
+        <div class="rounded-xl border border-brand-500/40 bg-ink-850 p-4">
+            <div class="text-[11px] uppercase tracking-wider text-slate-500">{{ __('panel.alert.where_to_fix') }}</div>
+            <div class="mt-1 flex flex-wrap items-center gap-3">
+                <code class="font-mono text-sm text-brand-300">{{ $whereToFix }}</code>
+                @if ($issue->last_trace_id ?? null)
+                    <a href="{{ route('project.trace', ['slug' => $project->slug, 'traceId' => $issue->last_trace_id]) }}" wire:navigate class="text-xs text-brand-400">{{ __('panel.alert.open_trace') }} →</a>
+                @endif
+            </div>
+        </div>
+    @endif
+
     @can('panel.manage')
         <div class="flex flex-wrap gap-2">
             <flux:button wire:click="resolve" size="sm" variant="primary">Resolve</flux:button>

@@ -91,4 +91,9 @@ return [
         'incidents' => 'Incidentes',
         'active_incidents' => 'Incidentes ativos',
     ],
+    'alert' => [
+        'where_to_fix' => 'Onde corrigir',
+        'open_trace' => 'Abrir trace',
+        'top_slow_queries' => 'Queries mais lentas',
+    ],
 ];

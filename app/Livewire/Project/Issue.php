@@ -89,6 +89,7 @@ class Issue extends Component
         return view('livewire.project.issue', [
             'project' => $project,
             'issue' => $issue,
+            'whereToFix' => \App\Alerting\AlertComposer::topAppFrame(is_array($issue->stack) ? $issue->stack : null),
             'comments' => $dashboard->comments($this->issueId),
         ]);
     }

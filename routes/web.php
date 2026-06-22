@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Admin\Audit as AdminAudit;
 use App\Livewire\Admin\Project as AdminProject;
 use App\Livewire\Admin\Projects;
 use App\Livewire\Overview;
@@ -34,6 +35,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/admin/projects', Projects::class)->middleware('can:panel.manage')->name('admin.projects');
     Route::get('/admin/projects/{slug}/manage', AdminProject::class)->middleware('can:panel.manage')->name('admin.project');
+    Route::get('/admin/audit', AdminAudit::class)->middleware('can:panel.manage')->name('admin.audit');
 
     Route::get('/projects/{slug}', ProjectShow::class)->name('project.show');
     Route::get('/projects/{slug}/database', ProjectDatabase::class)->name('project.database');

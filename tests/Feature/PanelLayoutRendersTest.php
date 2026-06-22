@@ -21,6 +21,7 @@ it('renders authenticated panel pages with the full layout for an admin', functi
     '/',
     '/admin/projects',
     '/admin/projects/{slug}/manage',
+    '/admin/audit',
     '/projects/{slug}',
     '/projects/{slug}/database',
     '/projects/{slug}/jobs',

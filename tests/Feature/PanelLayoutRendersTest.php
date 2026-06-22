@@ -20,6 +20,7 @@ it('renders authenticated panel pages with the full layout for an admin', functi
 })->with([
     '/',
     '/admin/projects',
+    '/admin/projects/{slug}/manage',
     '/projects/{slug}',
     '/projects/{slug}/database',
     '/projects/{slug}/jobs',

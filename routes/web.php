@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Admin\Project as AdminProject;
 use App\Livewire\Admin\Projects;
 use App\Livewire\Overview;
 use App\Livewire\Project\Database as ProjectDatabase;
@@ -32,6 +33,7 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
 
     Route::get('/admin/projects', Projects::class)->middleware('can:panel.manage')->name('admin.projects');
+    Route::get('/admin/projects/{slug}/manage', AdminProject::class)->middleware('can:panel.manage')->name('admin.project');
 
     Route::get('/projects/{slug}', ProjectShow::class)->name('project.show');
     Route::get('/projects/{slug}/database', ProjectDatabase::class)->name('project.database');

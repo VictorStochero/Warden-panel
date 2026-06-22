@@ -39,3 +39,31 @@ it('forbids non-admins from the projects screen', function () {
     $viewer = User::factory()->create(['is_admin' => false]);
     $this->actingAs($viewer)->get('/admin/projects')->assertForbidden();
 });
+
+it('rotates a token and re-shows the one-time snippet', function () {
+    $admin = User::factory()->create(['is_admin' => true]);
+    $project = app(\VictorStochero\Warden\Projects\ProjectManager::class)->create('Rotate Me')['project'];
+    $before = $project->fresh()->token;
+
+    Livewire::actingAs($admin)->test(\App\Livewire\Admin\Projects::class)
+        ->call('rotateToken', $project->slug)
+        ->assertSee('WARDEN_MODE=child');
+
+    expect($project->fresh()->token)->not->toBe($before);
+
+    $audit = \VictorStochero\Warden\Models\AuditLog::query()->latest('id')->firstOrFail();
+    expect($audit->action)->toBe('panel.project.rotate')->and($audit->target)->toBe($project->slug);
+});
+
+it('toggles a project active flag and audits it', function () {
+    $admin = User::factory()->create(['is_admin' => true]);
+    $project = app(\VictorStochero\Warden\Projects\ProjectManager::class)->create('Toggle Me')['project'];
+
+    Livewire::actingAs($admin)->test(\App\Livewire\Admin\Projects::class)
+        ->call('toggleActive', $project->slug);
+
+    expect($project->fresh()->active)->toBeFalse();
+
+    $audit = \VictorStochero\Warden\Models\AuditLog::query()->latest('id')->firstOrFail();
+    expect($audit->action)->toBe('panel.project.deactivate')->and($audit->target)->toBe($project->slug);
+});

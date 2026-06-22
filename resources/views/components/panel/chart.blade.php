@@ -22,5 +22,5 @@
             stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"></polyline>
     </svg>
 @else
-    <div class="flex items-center rounded-lg bg-ink-850 px-3 text-xs text-slate-600" style="height: {{ $h }}px">No data</div>
+    <div class="flex items-center rounded-lg bg-ink-850 px-3 text-xs text-slate-600" style="height: {{ $h }}px">{{ __('panel.common.no_data') }}</div>
 @endif

@@ -13,5 +13,5 @@
         @endforeach
     </div>
 @else
-    <div class="flex items-center rounded-lg bg-ink-850 px-3 text-xs text-slate-600" style="height: {{ $height }}px">No data</div>
+    <div class="flex items-center rounded-lg bg-ink-850 px-3 text-xs text-slate-600" style="height: {{ $height }}px">{{ __('panel.common.no_data') }}</div>
 @endif

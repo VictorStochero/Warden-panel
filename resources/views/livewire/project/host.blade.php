@@ -1,6 +1,6 @@
 <div wire:poll.{{ config('panel.poll_seconds') }}s class="space-y-6">
     <x-panel.banners :project="$project" />
-    <x-panel.page-header :title="$project->name . ' · Host'" :range="$range" :ranges="$ranges" />
+    <x-panel.page-header :title="$project->name . ' · ' . __('panel.nav.host')" :range="$range" :ranges="$ranges" />
     <x-panel.kpi-strip :project="$project" :kpis="$kpis" />
 
     @if (empty($latest))

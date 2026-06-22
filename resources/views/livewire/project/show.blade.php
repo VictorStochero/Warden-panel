@@ -18,13 +18,13 @@
             </div>
 
             <div class="rounded-xl bg-ink-850 p-4">
-                <flux:heading size="lg" class="mb-3">Top routes</flux:heading>
+                <flux:heading size="lg" class="mb-3">{{ __('panel.common.top_routes') }}</flux:heading>
                 <flux:table>
                     <flux:table.columns>
-                        <flux:table.column>Route</flux:table.column>
-                        <flux:table.column>Count</flux:table.column>
+                        <flux:table.column>{{ __('panel.common.route') }}</flux:table.column>
+                        <flux:table.column>{{ __('panel.common.count') }}</flux:table.column>
                         <flux:table.column>p95</flux:table.column>
-                        <flux:table.column>Errors</flux:table.column>
+                        <flux:table.column>{{ __('panel.common.errors') }}</flux:table.column>
                     </flux:table.columns>
                     <flux:table.rows>
                         @foreach ($routes as $row)
@@ -40,12 +40,12 @@
             </div>
 
             <div class="rounded-xl bg-ink-850 p-4">
-                <flux:heading size="lg" class="mb-3">Slowest queries</flux:heading>
+                <flux:heading size="lg" class="mb-3">{{ __('panel.common.slowest_queries') }}</flux:heading>
                 <flux:table>
                     <flux:table.columns>
-                        <flux:table.column>Query</flux:table.column>
-                        <flux:table.column>Count</flux:table.column>
-                        <flux:table.column>Avg</flux:table.column>
+                        <flux:table.column>{{ __('panel.common.query') }}</flux:table.column>
+                        <flux:table.column>{{ __('panel.common.count') }}</flux:table.column>
+                        <flux:table.column>{{ __('panel.common.avg') }}</flux:table.column>
                     </flux:table.columns>
                     <flux:table.rows>
                         @forelse ($slowQueries as $q)
@@ -66,7 +66,7 @@
         <div class="space-y-6">
             @if ($incidents->where('status', 'open')->isNotEmpty())
                 <div class="rounded-xl border border-rose-500/40 bg-ink-850 p-4">
-                    <flux:heading size="sm" class="mb-2 text-rose-400">Active incidents</flux:heading>
+                    <flux:heading size="sm" class="mb-2 text-rose-400">{{ __('panel.common.active_incidents') }}</flux:heading>
                     @foreach ($incidents->where('status', 'open') as $incident)
                         <a href="{{ route('project.incident', ['slug' => $project->slug, 'incidentId' => $incident->id]) }}" wire:navigate
                             class="block border-b border-ink-800 py-1.5 text-sm hover:text-brand-400">{{ $incident->subject ?? $incident->summary }}</a>
@@ -75,7 +75,7 @@
             @endif
 
             <div class="rounded-xl bg-ink-850 p-4">
-                <flux:heading size="sm" class="mb-2">Recent issues</flux:heading>
+                <flux:heading size="sm" class="mb-2">{{ __('panel.common.recent_issues') }}</flux:heading>
                 @forelse ($recentIssues as $issue)
                     <a href="{{ route('project.issue', ['slug' => $project->slug, 'issueId' => $issue->id]) }}" wire:navigate
                         class="block border-b border-ink-800 py-1.5 hover:text-brand-400">
@@ -88,7 +88,7 @@
             </div>
 
             <div class="rounded-xl bg-ink-850 p-4">
-                <flux:heading size="sm" class="mb-2">Heartbeats</flux:heading>
+                <flux:heading size="sm" class="mb-2">{{ __('panel.common.heartbeats') }}</flux:heading>
                 @forelse ($heartbeats as $hb)
                     <div class="flex items-center gap-2 border-b border-ink-800 py-1.5 text-xs">
                         <span class="h-2 w-2 rounded-full {{ $hb['healthy'] ? 'bg-emerald-400' : 'bg-rose-400' }}"></span>
@@ -101,7 +101,7 @@
             </div>
 
             <div class="rounded-xl bg-ink-850 p-4">
-                <flux:heading size="sm" class="mb-2">Recent traces</flux:heading>
+                <flux:heading size="sm" class="mb-2">{{ __('panel.common.recent_traces') }}</flux:heading>
                 @forelse ($recentTraces as $t)
                     <a href="{{ route('project.trace', ['slug' => $project->slug, 'traceId' => $t['trace_id']]) }}" wire:navigate
                         class="flex items-center gap-2 border-b border-ink-800 py-1.5 text-xs hover:text-brand-400">

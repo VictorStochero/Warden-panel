@@ -1,6 +1,6 @@
 <div wire:poll.{{ config('panel.poll_seconds') }}s class="space-y-6">
     <x-panel.banners :project="$project" />
-    <x-panel.page-header :title="$project->name . ' · Mail'" :range="$range" :ranges="$ranges" />
+    <x-panel.page-header :title="$project->name . ' · ' . __('panel.nav.mail')" :range="$range" :ranges="$ranges" />
     <x-panel.kpi-strip :project="$project" :kpis="$kpis" />
 
     <div class="grid gap-6 lg:grid-cols-2">
@@ -10,7 +10,7 @@
                 <flux:table.columns>
                     <flux:table.column>Mailer</flux:table.column>
                     <flux:table.column>Sent</flux:table.column>
-                    <flux:table.column>Avg</flux:table.column>
+                    <flux:table.column>{{ __('panel.common.avg') }}</flux:table.column>
                 </flux:table.columns>
                 <flux:table.rows>
                     @forelse ($mailers as $m)
@@ -31,7 +31,7 @@
                 <flux:table.columns>
                     <flux:table.column>Notification</flux:table.column>
                     <flux:table.column>Sent</flux:table.column>
-                    <flux:table.column>Avg</flux:table.column>
+                    <flux:table.column>{{ __('panel.common.avg') }}</flux:table.column>
                 </flux:table.columns>
                 <flux:table.rows>
                     @forelse ($notifications as $n)

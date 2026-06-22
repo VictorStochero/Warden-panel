@@ -18,7 +18,7 @@
                     <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
                     <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-400"></span>
                 </span>
-                LIVE
+                {{ __('panel.shell.live') }}
             </span>
         @endif
         @if ($showRanges && $ranges)
@@ -38,7 +38,7 @@
                     'cursor-pointer list-none rounded-md px-2.5 py-1 text-xs',
                     'bg-brand-600 text-white' => $customActive,
                     'bg-ink-850 text-slate-400 hover:text-slate-200' => ! $customActive,
-                ])>{{ $customActive ? 'Custom ✓' : 'Custom' }}</summary>
+                ])>{{ $customActive ? __('panel.shell.custom').' ✓' : __('panel.shell.custom') }}</summary>
                 <div class="absolute right-0 z-20 mt-1 w-64 space-y-2 rounded-lg bg-ink-900 p-3 ring-1 ring-ink-700"
                     x-data="{ from: @js(request()->query('from', '')), to: @js(request()->query('to', '')) }">
                     <label class="block text-[10px] uppercase tracking-wider text-slate-500">From
@@ -48,8 +48,8 @@
                         <input type="datetime-local" x-model="to" class="mt-1 w-full rounded bg-ink-850 px-2 py-1 text-xs text-slate-100" />
                     </label>
                     <div class="flex gap-2">
-                        <button type="button" @click="if (from && to) { $wire.set('from', from); $wire.set('to', to); }" class="flex-1 rounded bg-brand-600 px-2 py-1 text-xs text-white">Apply</button>
-                        <button type="button" @click="from=''; to=''; $wire.set('from', ''); $wire.set('to', '')" class="rounded bg-ink-850 px-2 py-1 text-xs text-slate-400">Clear</button>
+                        <button type="button" @click="if (from && to) { $wire.set('from', from); $wire.set('to', to); }" class="flex-1 rounded bg-brand-600 px-2 py-1 text-xs text-white">{{ __('panel.shell.apply') }}</button>
+                        <button type="button" @click="from=''; to=''; $wire.set('from', ''); $wire.set('to', '')" class="rounded bg-ink-850 px-2 py-1 text-xs text-slate-400">{{ __('panel.shell.clear') }}</button>
                     </div>
                 </div>
             </details>

@@ -1,6 +1,6 @@
 <div wire:poll.{{ config('panel.poll_seconds') }}s class="space-y-6">
     <x-panel.banners :project="$project" />
-    <x-panel.page-header :title="$project->name . ' · Logs'" :range="$range" :ranges="$ranges" />
+    <x-panel.page-header :title="$project->name . ' · ' . __('panel.nav.logs')" :range="$range" :ranges="$ranges" />
     <x-panel.kpi-strip :project="$project" :kpis="$kpis" />
 
     @php($levelBar = ['debug' => 'bg-slate-500', 'info' => 'bg-brand-500', 'warning' => 'bg-amber-500', 'error' => 'bg-rose-500', 'critical' => 'bg-rose-600'])

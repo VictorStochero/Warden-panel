@@ -1,7 +1,7 @@
 {{-- resources/views/livewire/project/database.blade.php --}}
 <div wire:poll.{{ config('panel.poll_seconds') }}s class="space-y-6">
     <x-panel.banners :project="$project" />
-    <x-panel.page-header :title="$project->name . ' · Database'" :range="$range" :ranges="$ranges" />
+    <x-panel.page-header :title="$project->name . ' · ' . __('panel.nav.database')" :range="$range" :ranges="$ranges" />
     <x-panel.kpi-strip :project="$project" :kpis="$kpis" />
 
     <div class="rounded-xl bg-ink-850 p-4">
@@ -35,7 +35,7 @@
                     <div class="text-sm font-medium text-slate-300 mb-2">{{ $label }}</div>
                     <flux:table>
                         <flux:table.columns>
-                            <flux:table.column>Query</flux:table.column>
+                            <flux:table.column>{{ __('panel.common.query') }}</flux:table.column>
                             <flux:table.column>{{ $key === 'slow' ? 'Duration' : 'Count' }}</flux:table.column>
                         </flux:table.columns>
                         <flux:table.rows>
@@ -64,10 +64,10 @@
             <flux:heading size="lg" class="mb-3">{{ $title }}</flux:heading>
             <flux:table>
                 <flux:table.columns>
-                    <flux:table.column>Query</flux:table.column>
-                    <flux:table.column>Count</flux:table.column>
-                    <flux:table.column>Avg</flux:table.column>
-                    <flux:table.column>Max</flux:table.column>
+                    <flux:table.column>{{ __('panel.common.query') }}</flux:table.column>
+                    <flux:table.column>{{ __('panel.common.count') }}</flux:table.column>
+                    <flux:table.column>{{ __('panel.common.avg') }}</flux:table.column>
+                    <flux:table.column>{{ __('panel.common.max') }}</flux:table.column>
                 </flux:table.columns>
                 <flux:table.rows>
                     @foreach ($rows as $row)

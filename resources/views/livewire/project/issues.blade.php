@@ -1,5 +1,5 @@
 <div wire:poll.{{ config('panel.poll_seconds') }}s class="space-y-6">
-    <x-panel.page-header :title="$project->name . ' · Issues'" :showRanges="false" />
+    <x-panel.page-header :title="$project->name . ' · ' . __('panel.nav.issues')" :showRanges="false" />
 
     <div class="flex justify-end">
         <flux:select wire:model.live="status" class="max-w-40">
@@ -14,8 +14,8 @@
         <flux:table>
             <flux:table.columns>
                 <flux:table.column>Issue</flux:table.column>
-                <flux:table.column>Status</flux:table.column>
-                <flux:table.column>Count</flux:table.column>
+                <flux:table.column>{{ __('panel.common.status') }}</flux:table.column>
+                <flux:table.column>{{ __('panel.common.count') }}</flux:table.column>
                 <flux:table.column>Last seen</flux:table.column>
             </flux:table.columns>
             <flux:table.rows>

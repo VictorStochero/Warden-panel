@@ -12,14 +12,14 @@
     $uptimeTone = $uptime >= 99.9 ? 'emerald' : ($uptime >= 95 ? 'amber' : 'rose');
 
     $cards = [
-        ['Throughput', number_format($kpis['throughput']), 'white', route('project.requests', $project->slug)],
-        ['Error rate', $kpis['error_rate'].'%', $errorTone, route('project.errors', $project->slug)],
-        ['p95', $kpis['p95'] !== null ? $kpis['p95'].'ms' : '—', $p95Tone, route('project.requests', $project->slug)],
-        ['Slow', number_format($kpis['slow'] ?? 0), 'white', route('project.requests', $project->slug)],
-        ['Failed jobs', number_format($kpis['failed_jobs']), $kpis['failed_jobs'] > 0 ? 'rose' : 'white', route('project.jobs', $project->slug)],
-        ['Cache hit', $kpis['cache_hit_rate'] !== null ? $kpis['cache_hit_rate'].'%' : '—', 'white', route('project.database', $project->slug)],
-        ['Open issues', $kpis['open_issues'], $kpis['open_issues'] > 0 ? 'amber' : 'white', route('project.issues', $project->slug)],
-        ['Uptime', round($uptime, 2).'%', $uptimeTone, route('project.uptime', $project->slug)],
+        [__('panel.kpi.throughput'), number_format($kpis['throughput']), 'white', route('project.requests', $project->slug)],
+        [__('panel.kpi.error_rate'), $kpis['error_rate'].'%', $errorTone, route('project.errors', $project->slug)],
+        [__('panel.kpi.p95'), $kpis['p95'] !== null ? $kpis['p95'].'ms' : '—', $p95Tone, route('project.requests', $project->slug)],
+        [__('panel.kpi.slow'), number_format($kpis['slow'] ?? 0), 'white', route('project.requests', $project->slug)],
+        [__('panel.kpi.failed_jobs'), number_format($kpis['failed_jobs']), $kpis['failed_jobs'] > 0 ? 'rose' : 'white', route('project.jobs', $project->slug)],
+        [__('panel.kpi.cache_hit'), $kpis['cache_hit_rate'] !== null ? $kpis['cache_hit_rate'].'%' : '—', 'white', route('project.database', $project->slug)],
+        [__('panel.kpi.open_issues'), $kpis['open_issues'], $kpis['open_issues'] > 0 ? 'amber' : 'white', route('project.issues', $project->slug)],
+        [__('panel.kpi.uptime'), round($uptime, 2).'%', $uptimeTone, route('project.uptime', $project->slug)],
     ];
 @endphp
 <div class="grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-8">

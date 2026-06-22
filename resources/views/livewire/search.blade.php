@@ -7,7 +7,7 @@
     <button type="button" wire:click="$set('open', true)"
         class="flex w-full items-center gap-2 rounded-lg bg-ink-850 px-3 py-2 text-sm text-slate-400 transition hover:text-slate-200">
         <flux:icon name="magnifying-glass" class="size-4" />
-        <span>Search</span>
+        <span>{{ __('panel.shell.search') }}</span>
         <span class="ml-auto font-mono text-xs text-slate-500">⌘K</span>
     </button>
 

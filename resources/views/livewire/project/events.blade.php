@@ -1,6 +1,6 @@
 <div wire:poll.{{ config('panel.poll_seconds') }}s class="space-y-6">
     <x-panel.banners :project="$project" />
-    <x-panel.page-header :title="$project->name . ' · Events'" :range="$range" :ranges="$ranges" />
+    <x-panel.page-header :title="$project->name . ' · ' . __('panel.nav.events')" :range="$range" :ranges="$ranges" />
     <x-panel.kpi-strip :project="$project" :kpis="$kpis" />
 
     <div class="flex justify-end">
@@ -12,7 +12,7 @@
     <div class="rounded-xl bg-ink-850 p-4">
         <flux:table>
             <flux:table.columns>
-                <flux:table.column>Time</flux:table.column>
+                <flux:table.column>{{ __('panel.common.time') }}</flux:table.column>
                 <flux:table.column>Summary</flux:table.column>
                 <flux:table.column>Trace</flux:table.column>
             </flux:table.columns>

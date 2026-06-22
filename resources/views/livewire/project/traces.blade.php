@@ -1,5 +1,5 @@
 <div wire:poll.{{ config('panel.poll_seconds') }}s class="space-y-6">
-    <x-panel.page-header :title="$project->name . ' · Traces'" :showRanges="false" />
+    <x-panel.page-header :title="$project->name . ' · ' . __('panel.nav.traces')" :showRanges="false" />
 
     <div class="rounded-xl bg-ink-850 p-4">
         <flux:table>
@@ -7,7 +7,7 @@
                 <flux:table.column>Trace</flux:table.column>
                 <flux:table.column>Type</flux:table.column>
                 <flux:table.column>Entry</flux:table.column>
-                <flux:table.column>Duration</flux:table.column>
+                <flux:table.column>{{ __('panel.common.duration') }}</flux:table.column>
             </flux:table.columns>
             <flux:table.rows>
                 @forelse ($traces as $t)

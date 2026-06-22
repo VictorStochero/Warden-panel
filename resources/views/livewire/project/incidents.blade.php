@@ -1,11 +1,11 @@
 <div wire:poll.{{ config('panel.poll_seconds') }}s class="space-y-6">
-    <x-panel.page-header :title="$project->name . ' · Incidents'" :showRanges="false" />
+    <x-panel.page-header :title="$project->name . ' · ' . __('panel.nav.incidents')" :showRanges="false" />
 
     <div class="rounded-xl bg-ink-850 p-4">
         <flux:table>
             <flux:table.columns>
                 <flux:table.column>Incident</flux:table.column>
-                <flux:table.column>Status</flux:table.column>
+                <flux:table.column>{{ __('panel.common.status') }}</flux:table.column>
                 <flux:table.column>Started</flux:table.column>
             </flux:table.columns>
             <flux:table.rows>

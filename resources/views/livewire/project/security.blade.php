@@ -1,6 +1,6 @@
 <div wire:poll.{{ config('panel.poll_seconds') }}s class="space-y-6">
     <x-panel.banners :project="$project" />
-    <x-panel.page-header :title="$project->name . ' · Security'" :showRanges="false" />
+    <x-panel.page-header :title="$project->name . ' · ' . __('panel.nav.security')" :showRanges="false" />
 
     @if ($audit === null)
         <flux:callout variant="secondary">No dependency audit recorded — run <span class="font-mono">warden:audit</span> on the child.</flux:callout>

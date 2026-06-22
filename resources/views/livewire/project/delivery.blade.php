@@ -1,6 +1,6 @@
 <div wire:poll.{{ config('panel.poll_seconds') }}s class="space-y-6">
     <x-panel.banners :project="$project" />
-    <x-panel.page-header :title="$project->name . ' · Delivery'" :showRanges="false" />
+    <x-panel.page-header :title="$project->name . ' · ' . __('panel.nav.delivery')" :showRanges="false" />
 
     <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
         @php($cards = [

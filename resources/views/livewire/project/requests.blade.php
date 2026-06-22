@@ -1,6 +1,6 @@
 <div wire:poll.{{ config('panel.poll_seconds') }}s class="space-y-6">
     <x-panel.banners :project="$project" />
-    <x-panel.page-header :title="$project->name . ' · Requests'" :range="$range" :ranges="$ranges" />
+    <x-panel.page-header :title="$project->name . ' · ' . __('panel.nav.requests')" :range="$range" :ranges="$ranges" />
     <x-panel.kpi-strip :project="$project" :kpis="$kpis" />
 
     @if ($markers->isNotEmpty())
@@ -31,13 +31,13 @@
     </div>
 
     <div class="rounded-xl bg-ink-850 p-4">
-        <flux:heading size="lg" class="mb-3">Top routes</flux:heading>
+        <flux:heading size="lg" class="mb-3">{{ __('panel.common.top_routes') }}</flux:heading>
         <flux:table>
             <flux:table.columns>
-                <flux:table.column>Route</flux:table.column>
-                <flux:table.column>Count</flux:table.column>
+                <flux:table.column>{{ __('panel.common.route') }}</flux:table.column>
+                <flux:table.column>{{ __('panel.common.count') }}</flux:table.column>
                 <flux:table.column>p95</flux:table.column>
-                <flux:table.column>Errors</flux:table.column>
+                <flux:table.column>{{ __('panel.common.errors') }}</flux:table.column>
             </flux:table.columns>
             <flux:table.rows>
                 @foreach ($routes as $row)
@@ -53,13 +53,13 @@
     </div>
 
     <div class="rounded-xl bg-ink-850 p-4">
-        <flux:heading size="lg" class="mb-3">Recent requests</flux:heading>
+        <flux:heading size="lg" class="mb-3">{{ __('panel.common.recent_requests') }}</flux:heading>
         <flux:table>
             <flux:table.columns>
-                <flux:table.column>Time</flux:table.column>
-                <flux:table.column>Request</flux:table.column>
-                <flux:table.column>Status</flux:table.column>
-                <flux:table.column>Duration</flux:table.column>
+                <flux:table.column>{{ __('panel.common.time') }}</flux:table.column>
+                <flux:table.column>{{ __('panel.common.request') }}</flux:table.column>
+                <flux:table.column>{{ __('panel.common.status') }}</flux:table.column>
+                <flux:table.column>{{ __('panel.common.duration') }}</flux:table.column>
             </flux:table.columns>
             <flux:table.rows>
                 @forelse ($recent as $e)

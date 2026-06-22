@@ -1,6 +1,6 @@
 <div wire:poll.{{ config('panel.poll_seconds') }}s class="space-y-6">
     <x-panel.banners :project="$project" />
-    <x-panel.page-header :title="$project->name . ' · Errors'" :showRanges="false" />
+    <x-panel.page-header :title="$project->name . ' · ' . __('panel.nav.errors')" :showRanges="false" />
 
     <flux:callout variant="secondary">
         Failed requests (HTTP ≥ 500). Grouped exceptions live under
@@ -29,9 +29,9 @@
     <div class="rounded-xl bg-ink-850 p-4">
         <flux:table>
             <flux:table.columns>
-                <flux:table.column>Time</flux:table.column>
-                <flux:table.column>Request</flux:table.column>
-                <flux:table.column>Status</flux:table.column>
+                <flux:table.column>{{ __('panel.common.time') }}</flux:table.column>
+                <flux:table.column>{{ __('panel.common.request') }}</flux:table.column>
+                <flux:table.column>{{ __('panel.common.status') }}</flux:table.column>
                 <flux:table.column>Release</flux:table.column>
             </flux:table.columns>
             <flux:table.rows>

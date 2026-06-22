@@ -1,6 +1,6 @@
 <div wire:poll.{{ config('panel.poll_seconds') }}s class="space-y-6">
     <x-panel.banners :project="$project" />
-    <x-panel.page-header :title="$project->name . ' · Uptime'" :showRanges="false" />
+    <x-panel.page-header :title="$project->name . ' · ' . __('panel.nav.uptime')" :showRanges="false" />
     <x-panel.kpi-strip :project="$project" :kpis="$kpis" />
 
     <div class="rounded-xl bg-ink-850 p-4 shadow-glow">

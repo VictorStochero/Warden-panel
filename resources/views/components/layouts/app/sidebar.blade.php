@@ -11,6 +11,9 @@
                 <x-app-logo class="size-8" href="#"></x-app-logo>
             </a>
 
+            <style>[x-cloak]{display:none!important}</style>
+            <div class="mb-3"><livewire:search /></div>
+
             <flux:navlist variant="outline">
                 <flux:navlist.group heading="Warden" class="grid">
                     <flux:navlist.item icon="server" :href="route('home')" :current="request()->routeIs('home')" wire:navigate>Fleet</flux:navlist.item>

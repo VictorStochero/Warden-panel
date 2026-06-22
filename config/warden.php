@@ -425,7 +425,9 @@ return [
         'channels' => [
             DatabaseAlertChannel::class,
             LogAlertChannel::class,
-            MailAlertChannel::class,
+            // Panel didactic channel (e-mail + webhook with "where to fix").
+            // Replaces the package's terse MailAlertChannel.
+            \App\Alerting\PanelDidacticChannel::class,
             SlackAlertChannel::class,
             DiscordAlertChannel::class,
             WebhookAlertChannel::class,

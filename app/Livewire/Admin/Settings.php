@@ -7,6 +7,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Component;
 use VictorStochero\Warden\Models\AlertRule;
 use VictorStochero\Warden\Models\AlertSetting;
+use VictorStochero\Warden\Models\Setting;
 
 #[Layout('components.layouts.app')]
 class Settings extends Component
@@ -17,6 +18,7 @@ class Settings extends Component
     public string $recipients = '';
     public string $minSeverity = 'warning';
     public int $cooldown = 300;
+    public string $alertWebhook = '';
 
     // New-rule form.
     public string $ruleName = '';
@@ -40,6 +42,7 @@ class Settings extends Component
         $this->recipients = implode("\n", $settings->recipients ?? []);
         $this->minSeverity = $settings->min_severity;
         $this->cooldown = (int) $settings->cooldown;
+        $this->alertWebhook = (string) Setting::read('panel.alert_webhook', '');
     }
 
     public function save(): void
@@ -61,6 +64,13 @@ class Settings extends Component
         $settings->min_severity = $this->minSeverity;
         $settings->cooldown = max(0, $this->cooldown);
         $settings->save();
+
+        $webhook = trim($this->alertWebhook);
+        if ($webhook !== '' && ! preg_match('#^https?://#i', $webhook)) {
+            $webhook = '';
+        }
+        $this->alertWebhook = $webhook;
+        Setting::write('panel.alert_webhook', $webhook);
 
         $this->audit('panel.settings.update', 'alert-settings');
         session()->flash('settings_saved', true);

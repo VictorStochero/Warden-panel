@@ -17,6 +17,7 @@
                 @foreach ($severities as $s)<flux:select.option value="{{ $s }}">{{ ucfirst($s) }}</flux:select.option>@endforeach
             </flux:select>
             <flux:input type="number" wire:model="cooldown" label="Cooldown (seconds)" min="0" />
+            <flux:input wire:model="alertWebhook" label="Alert webhook URL (Slack/Discord)" description="Receives the didactic alert (exception + where to fix + link). Leave empty to disable." />
             <div><flux:button type="submit" variant="primary">Save</flux:button></div>
         </form>
     </div>

@@ -38,6 +38,15 @@ Route::view('dashboard', 'dashboard')
 Route::middleware(['auth'])->group(function () {
     Route::get('/', Overview::class)->name('home');
 
+    Route::post('/locale', function (\Illuminate\Http\Request $request) {
+        $locale = (string) $request->input('locale');
+        if (in_array($locale, \App\Http\Middleware\SetLocale::SUPPORTED, true)) {
+            $request->session()->put('locale', $locale);
+        }
+
+        return back();
+    })->name('locale.set');
+
     Route::redirect('settings', 'settings/profile');
 
     Volt::route('settings/profile', 'settings.profile')->name('settings.profile');

@@ -1,0 +1,38 @@
+<?php
+
+return [
+    'groups' => [
+        'warden' => 'Warden',
+        'overview' => 'Overview',
+        'performance' => 'Performance',
+        'reliability' => 'Reliability',
+        'diagnostics' => 'Diagnostics',
+        'system' => 'System',
+    ],
+    'nav' => [
+        'fleet' => 'Fleet',
+        'projects' => 'Projects',
+        'audit' => 'Audit',
+        'maintenance' => 'Maintenance',
+        'settings' => 'Settings',
+        'api_tokens' => 'API Tokens',
+        'overview' => 'Overview',
+        'requests' => 'Requests',
+        'database' => 'Database',
+        'jobs' => 'Jobs',
+        'http' => 'HTTP',
+        'schedule' => 'Schedule',
+        'errors' => 'Errors',
+        'issues' => 'Issues',
+        'incidents' => 'Incidents',
+        'uptime' => 'Uptime',
+        'traces' => 'Traces',
+        'logs' => 'Logs',
+        'events' => 'Events',
+        'host' => 'Host',
+        'mail' => 'Mail',
+        'security' => 'Security',
+        'delivery' => 'Delivery',
+    ],
+    'search' => 'Search',
+];

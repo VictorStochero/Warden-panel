@@ -1,0 +1,38 @@
+<?php
+
+return [
+    'groups' => [
+        'warden' => 'Warden',
+        'overview' => 'Visão geral',
+        'performance' => 'Desempenho',
+        'reliability' => 'Confiabilidade',
+        'diagnostics' => 'Diagnóstico',
+        'system' => 'Sistema',
+    ],
+    'nav' => [
+        'fleet' => 'Frota',
+        'projects' => 'Projetos',
+        'audit' => 'Auditoria',
+        'maintenance' => 'Manutenção',
+        'settings' => 'Configurações',
+        'api_tokens' => 'Tokens de API',
+        'overview' => 'Visão geral',
+        'requests' => 'Requisições',
+        'database' => 'Banco de dados',
+        'jobs' => 'Jobs',
+        'http' => 'HTTP',
+        'schedule' => 'Agenda',
+        'errors' => 'Erros',
+        'issues' => 'Issues',
+        'incidents' => 'Incidentes',
+        'uptime' => 'Disponibilidade',
+        'traces' => 'Traces',
+        'logs' => 'Logs',
+        'events' => 'Eventos',
+        'host' => 'Host',
+        'mail' => 'E-mail',
+        'security' => 'Segurança',
+        'delivery' => 'Entrega',
+    ],
+    'search' => 'Buscar',
+];

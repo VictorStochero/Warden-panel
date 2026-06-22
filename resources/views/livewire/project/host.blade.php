@@ -16,12 +16,19 @@
             @foreach ($cards as [$label, $value])
                 <div class="rounded-xl bg-ink-850 p-4">
                     <div class="text-slate-400 text-sm">{{ $label }}</div>
-                    <div class="font-mono text-2xl text-brand-400">{{ $value }}</div>
+                    <div class="font-mono text-2xl text-white">{{ $value }}</div>
                 </div>
             @endforeach
         </div>
-        <div class="rounded-xl bg-ink-850 p-4 font-mono text-sm text-slate-400">
-            {{ $series->count() }} samples in this window.
+        <div class="grid gap-4 md:grid-cols-2">
+            <div class="rounded-xl bg-ink-850 p-4">
+                <div class="mb-2 text-[11px] uppercase tracking-wider text-slate-500">CPU %</div>
+                <x-panel.chart :values="$series->pluck('cpu')->map(fn ($v) => $v ?? 0)->all()" color="#6366f1" :height="72" />
+            </div>
+            <div class="rounded-xl bg-ink-850 p-4">
+                <div class="mb-2 text-[11px] uppercase tracking-wider text-slate-500">Memory %</div>
+                <x-panel.chart :values="$series->pluck('mem')->map(fn ($v) => $v ?? 0)->all()" color="#10b981" :height="72" />
+            </div>
         </div>
     @endif
 </div>

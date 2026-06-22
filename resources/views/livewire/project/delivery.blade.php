@@ -12,9 +12,14 @@
         @foreach ($cards as [$label, $value])
             <div class="rounded-xl bg-ink-850 p-4">
                 <div class="text-slate-400 text-sm">{{ $label }}</div>
-                <div class="font-mono text-lg text-brand-400">{{ $value }}</div>
+                <div class="font-mono text-lg text-white">{{ $value }}</div>
             </div>
         @endforeach
+    </div>
+
+    <div class="rounded-xl bg-ink-850 p-4">
+        <div class="mb-2 text-[11px] uppercase tracking-wider text-slate-500">Batches / minute (last {{ $delivery['window'] }}m)</div>
+        <x-panel.bars :values="$delivery['series']" color="#5B97FF" :height="56" />
     </div>
 
     <div class="rounded-xl bg-ink-850 p-4">

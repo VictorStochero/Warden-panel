@@ -3,9 +3,18 @@
     <x-panel.page-header :title="$project->name . ' · Requests'" :range="$range" :ranges="$ranges" />
     <x-panel.kpi-strip :project="$project" :kpis="$kpis" />
 
-    <div class="rounded-xl bg-ink-850 p-4">
-        <div class="font-mono text-sm text-slate-400">
-            {{ number_format($series->sum('count')) }} requests · {{ number_format($series->sum('errors')) }} errors across {{ $series->count() }} buckets
+    <div class="grid gap-4 md:grid-cols-3">
+        <div class="rounded-xl bg-ink-850 p-4">
+            <div class="mb-2 text-[11px] uppercase tracking-wider text-slate-500">Throughput</div>
+            <x-panel.bars :values="$series->pluck('count')->all()" color="#5B97FF" :height="64" />
+        </div>
+        <div class="rounded-xl bg-ink-850 p-4">
+            <div class="mb-2 text-[11px] uppercase tracking-wider text-slate-500">Errors</div>
+            <x-panel.bars :values="$series->pluck('errors')->all()" color="#fb7185" :height="64" />
+        </div>
+        <div class="rounded-xl bg-ink-850 p-4">
+            <div class="mb-2 text-[11px] uppercase tracking-wider text-slate-500">p95 latency</div>
+            <x-panel.chart :values="$series->pluck('p95')->map(fn ($v) => $v ?? 0)->all()" color="#fbbf24" :height="64" />
         </div>
     </div>
 

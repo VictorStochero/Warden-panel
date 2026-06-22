@@ -28,4 +28,6 @@
             <div class="text-slate-400 text-sm">No spans for this trace.</div>
         @endforelse
     </div>
+
+    <x-panel.related :project="$project" :traceId="$traceId" />
 </div>

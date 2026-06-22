@@ -7,6 +7,7 @@ use App\Livewire\Project\Http as ProjectHttp;
 use App\Livewire\Project\Issue as ProjectIssue;
 use App\Livewire\Project\Incidents as ProjectIncidents;
 use App\Livewire\Project\Logs as ProjectLogs;
+use App\Livewire\Project\Events as ProjectEvents;
 use App\Livewire\Project\Issues as ProjectIssues;
 use App\Livewire\Project\Jobs as ProjectJobs;
 use App\Livewire\Project\Schedule as ProjectSchedule;
@@ -44,6 +45,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/projects/{slug}/issues/{issueId}', ProjectIssue::class)->name('project.issue');
     Route::get('/projects/{slug}/incidents', ProjectIncidents::class)->name('project.incidents');
     Route::get('/projects/{slug}/logs', ProjectLogs::class)->name('project.logs');
+    Route::get('/projects/{slug}/events', ProjectEvents::class)->name('project.events');
 });
 
 require __DIR__.'/auth.php';

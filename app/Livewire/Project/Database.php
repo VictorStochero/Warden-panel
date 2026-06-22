@@ -34,6 +34,7 @@ class Database extends Component
             'slowQueries' => $dashboard->slowQueries($project->id, $this->range, 15),
             'frequentQueries' => $dashboard->frequentQueries($project->id, $this->range, 15),
             'queryHealth' => $dashboard->queryHealth($project->id, $this->range),
+            'cacheStores' => $dashboard->cacheStores($project->id, $this->range),
         ]);
     }
 }

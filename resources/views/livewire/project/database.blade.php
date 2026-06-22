@@ -82,4 +82,30 @@
             </flux:table>
         </div>
     @endforeach
+
+    <div class="rounded-xl bg-ink-850 p-4">
+        <flux:heading size="lg" class="mb-3">Cache stores</flux:heading>
+        <flux:table>
+            <flux:table.columns>
+                <flux:table.column>Store</flux:table.column>
+                <flux:table.column>Hits</flux:table.column>
+                <flux:table.column>Misses</flux:table.column>
+                <flux:table.column>Hit rate</flux:table.column>
+                <flux:table.column>Writes</flux:table.column>
+            </flux:table.columns>
+            <flux:table.rows>
+                @forelse ($cacheStores as $store)
+                    <flux:table.row wire:key="cache-{{ $loop->index }}">
+                        <flux:table.cell class="font-mono text-xs">{{ $store['key'] }}</flux:table.cell>
+                        <flux:table.cell>{{ number_format($store['hits']) }}</flux:table.cell>
+                        <flux:table.cell>{{ number_format($store['misses']) }}</flux:table.cell>
+                        <flux:table.cell class="{{ $store['rate'] >= 80 ? 'text-emerald-400' : ($store['rate'] >= 50 ? 'text-amber-400' : 'text-rose-400') }}">{{ $store['rate'] }}%</flux:table.cell>
+                        <flux:table.cell>{{ number_format($store['writes']) }}</flux:table.cell>
+                    </flux:table.row>
+                @empty
+                    <flux:table.row><flux:table.cell class="text-slate-400">No cache activity in this window.</flux:table.cell></flux:table.row>
+                @endforelse
+            </flux:table.rows>
+        </flux:table>
+    </div>
 </div>

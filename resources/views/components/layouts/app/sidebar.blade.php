@@ -22,6 +22,7 @@
                         <flux:navlist.item icon="clipboard-document-list" :href="route('admin.audit')" :current="request()->routeIs('admin.audit')" wire:navigate>Audit</flux:navlist.item>
                         <flux:navlist.item icon="wrench-screwdriver" :href="route('admin.maintenance')" :current="request()->routeIs('admin.maintenance')" wire:navigate>Maintenance</flux:navlist.item>
                         <flux:navlist.item icon="bell-alert" :href="route('admin.settings')" :current="request()->routeIs('admin.settings')" wire:navigate>Settings</flux:navlist.item>
+                        <flux:navlist.item icon="key" :href="route('admin.api-tokens')" :current="request()->routeIs('admin.api-tokens')" wire:navigate>API Tokens</flux:navlist.item>
                     @endcan
                 </flux:navlist.group>
                 @php($slug = request()->route('slug'))

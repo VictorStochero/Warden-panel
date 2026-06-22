@@ -24,6 +24,7 @@ it('renders authenticated panel pages with the full layout for an admin', functi
     '/admin/audit',
     '/admin/maintenance',
     '/admin/settings',
+    '/admin/api-tokens',
     '/projects/{slug}',
     '/projects/{slug}/requests',
     '/projects/{slug}/database',

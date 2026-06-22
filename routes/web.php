@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Admin\ApiTokens as AdminApiTokens;
 use App\Livewire\Admin\Audit as AdminAudit;
 use App\Livewire\Admin\Maintenance as AdminMaintenance;
 use App\Livewire\Admin\Project as AdminProject;
@@ -48,6 +49,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/audit', AdminAudit::class)->middleware('can:panel.manage')->name('admin.audit');
     Route::get('/admin/maintenance', AdminMaintenance::class)->middleware('can:panel.manage')->name('admin.maintenance');
     Route::get('/admin/settings', AdminSettings::class)->middleware('can:panel.manage')->name('admin.settings');
+    Route::get('/admin/api-tokens', AdminApiTokens::class)->middleware('can:panel.manage')->name('admin.api-tokens');
 
     Route::get('/projects/{slug}', ProjectShow::class)->name('project.show');
     Route::get('/projects/{slug}/requests', ProjectRequests::class)->name('project.requests');

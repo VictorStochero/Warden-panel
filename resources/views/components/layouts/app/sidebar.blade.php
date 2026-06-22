@@ -25,20 +25,28 @@
                         <flux:navlist.item :href="route('project.show', $slug)" :current="request()->routeIs('project.show')" wire:navigate>Overview</flux:navlist.item>
                     </flux:navlist.group>
                     <flux:navlist.group heading="Performance" class="grid">
+                        <flux:navlist.item :href="route('project.requests', $slug)" :current="request()->routeIs('project.requests')" wire:navigate>Requests</flux:navlist.item>
                         <flux:navlist.item :href="route('project.database', $slug)" :current="request()->routeIs('project.database')" wire:navigate>Database</flux:navlist.item>
                         <flux:navlist.item :href="route('project.jobs', $slug)" :current="request()->routeIs('project.jobs')" wire:navigate>Jobs</flux:navlist.item>
                         <flux:navlist.item :href="route('project.http', $slug)" :current="request()->routeIs('project.http')" wire:navigate>HTTP</flux:navlist.item>
                         <flux:navlist.item :href="route('project.schedule', $slug)" :current="request()->routeIs('project.schedule')" wire:navigate>Schedule</flux:navlist.item>
                     </flux:navlist.group>
                     <flux:navlist.group heading="Reliability" class="grid">
+                        <flux:navlist.item :href="route('project.errors', $slug)" :current="request()->routeIs('project.errors')" wire:navigate>Errors</flux:navlist.item>
                         <flux:navlist.item :href="route('project.issues', $slug)" :current="request()->routeIs('project.issues') || request()->routeIs('project.issue')" wire:navigate>Issues</flux:navlist.item>
-                        <flux:navlist.item :href="route('project.incidents', $slug)" :current="request()->routeIs('project.incidents')" wire:navigate>Incidents</flux:navlist.item>
+                        <flux:navlist.item :href="route('project.incidents', $slug)" :current="request()->routeIs('project.incidents') || request()->routeIs('project.incident')" wire:navigate>Incidents</flux:navlist.item>
                         <flux:navlist.item :href="route('project.uptime', $slug)" :current="request()->routeIs('project.uptime')" wire:navigate>Uptime</flux:navlist.item>
                     </flux:navlist.group>
                     <flux:navlist.group heading="Diagnostics" class="grid">
                         <flux:navlist.item :href="route('project.traces', $slug)" :current="request()->routeIs('project.traces') || request()->routeIs('project.trace')" wire:navigate>Traces</flux:navlist.item>
                         <flux:navlist.item :href="route('project.logs', $slug)" :current="request()->routeIs('project.logs')" wire:navigate>Logs</flux:navlist.item>
-                        <flux:navlist.item :href="route('project.events', $slug)" :current="request()->routeIs('project.events')" wire:navigate>Events</flux:navlist.item>
+                        <flux:navlist.item :href="route('project.events', $slug)" :current="request()->routeIs('project.events') || request()->routeIs('project.event')" wire:navigate>Events</flux:navlist.item>
+                    </flux:navlist.group>
+                    <flux:navlist.group heading="System" class="grid">
+                        <flux:navlist.item :href="route('project.host', $slug)" :current="request()->routeIs('project.host')" wire:navigate>Host</flux:navlist.item>
+                        <flux:navlist.item :href="route('project.mail', $slug)" :current="request()->routeIs('project.mail')" wire:navigate>Mail</flux:navlist.item>
+                        <flux:navlist.item :href="route('project.security', $slug)" :current="request()->routeIs('project.security')" wire:navigate>Security</flux:navlist.item>
+                        <flux:navlist.item :href="route('project.delivery', $slug)" :current="request()->routeIs('project.delivery')" wire:navigate>Delivery</flux:navlist.item>
                     </flux:navlist.group>
                 @endif
             </flux:navlist>

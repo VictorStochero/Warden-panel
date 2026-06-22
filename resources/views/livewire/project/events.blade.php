@@ -19,7 +19,9 @@
             <flux:table.rows>
                 @forelse ($events as $event)
                     <flux:table.row wire:key="event-{{ $event->id }}">
-                        <flux:table.cell class="font-mono text-xs text-slate-400">{{ $event->occurred_at }}</flux:table.cell>
+                        <flux:table.cell class="font-mono text-xs text-slate-400">
+                            <a class="text-brand-400" href="{{ route('project.event', ['slug' => $project->slug, 'eventId' => $event->id]) }}" wire:navigate>{{ $event->occurred_at }}</a>
+                        </flux:table.cell>
                         <flux:table.cell class="font-mono text-xs truncate max-w-md">{{ is_array($event->payload) ? json_encode($event->payload) : '' }}</flux:table.cell>
                         <flux:table.cell class="font-mono text-xs">
                             @if ($event->trace_id)

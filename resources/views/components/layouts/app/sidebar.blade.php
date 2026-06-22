@@ -15,7 +15,7 @@
                 <flux:navlist.group heading="Warden" class="grid">
                     <flux:navlist.item icon="server" :href="route('home')" :current="request()->routeIs('home')" wire:navigate>Fleet</flux:navlist.item>
                     @can('panel.manage')
-                        <flux:navlist.item icon="folder-cog" :href="route('admin.projects')" :current="request()->routeIs('admin.projects')" wire:navigate>Projects</flux:navlist.item>
+                        <flux:navlist.item icon="folder" :href="route('admin.projects')" :current="request()->routeIs('admin.projects')" wire:navigate>Projects</flux:navlist.item>
                     @endcan
                 </flux:navlist.group>
                 @php($slug = request()->route('slug'))

@@ -20,6 +20,33 @@
         </form>
     </div>
 
+    <div class="rounded-xl bg-ink-850 p-6 space-y-4">
+        <flux:heading size="lg">Capture</flux:heading>
+        <form wire:submit="saveCapture" class="space-y-4">
+            <flux:select wire:model.live="captureProfile" label="Capture profile" class="max-w-xs">
+                @foreach ($captureProfiles as $p)<flux:select.option value="{{ $p }}">{{ ucfirst($p) }}</flux:select.option>@endforeach
+            </flux:select>
+
+            @if ($captureProfile === 'custom')
+                <div>
+                    <div class="mb-2 text-[11px] uppercase tracking-wider text-slate-500">Recorded types</div>
+                    <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                        @foreach ($captureTypes as $type)
+                            <flux:checkbox wire:model="typeGates.{{ $type }}" :label="ucfirst($type)" />
+                        @endforeach
+                    </div>
+                    <p class="mt-2 text-xs text-slate-500">Unchecked types stop being captured on the child.</p>
+                </div>
+            @elseif ($captureProfile === 'lean')
+                <p class="text-sm text-slate-400">Lean: captures requests/queries/exceptions/logs, gating the noisier types. Recommended default.</p>
+            @else
+                <p class="text-sm text-slate-400">Full: captures every recorder type.</p>
+            @endif
+
+            <div><flux:button type="submit" variant="primary">Apply capture profile</flux:button></div>
+        </form>
+    </div>
+
     <div class="rounded-xl border border-rose-500/40 bg-ink-850 p-6 space-y-4">
         <flux:heading size="lg" class="text-rose-400">Danger zone</flux:heading>
 

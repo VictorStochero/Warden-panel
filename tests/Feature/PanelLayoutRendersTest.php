@@ -29,4 +29,5 @@ it('renders authenticated panel pages with the full layout for an admin', functi
     '/projects/{slug}/traces',
     '/projects/{slug}/issues',
     '/projects/{slug}/incidents',
+    '/projects/{slug}/logs',
 ]);

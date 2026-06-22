@@ -38,7 +38,13 @@ class Show extends Component
             'ranges' => Ranges::all(),
             'kpis' => $dashboard->kpis($project->id, $this->range),
             'series' => $dashboard->requestSeries($project->id, $this->range),
-            'routes' => $dashboard->topRoutes($project->id, $this->range, 12, false),
+            'routes' => $dashboard->topRoutes($project->id, $this->range, 8, false),
+            'slowQueries' => $dashboard->slowQueries($project->id, $this->range, 6),
+            'queues' => $dashboard->queues($project->id, $this->range),
+            'recentIssues' => $dashboard->recentIssues($project->id, 6),
+            'incidents' => $dashboard->incidents($project->id, 6),
+            'heartbeats' => $dashboard->heartbeats($project->id),
+            'recentTraces' => $dashboard->recentTraces($project->id, 12),
         ]);
     }
 }

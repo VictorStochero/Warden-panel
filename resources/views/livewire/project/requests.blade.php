@@ -3,6 +3,18 @@
     <x-panel.page-header :title="$project->name . ' · Requests'" :range="$range" :ranges="$ranges" />
     <x-panel.kpi-strip :project="$project" :kpis="$kpis" />
 
+    @if ($markers->isNotEmpty())
+        <div class="flex flex-wrap items-center gap-2 rounded-xl bg-ink-850 p-3">
+            <span class="text-[11px] uppercase tracking-wider text-slate-500">Deploys</span>
+            @foreach ($markers as $m)
+                <span class="flex items-center gap-1.5 rounded-md bg-ink-900 px-2 py-1 font-mono text-xs text-brand-400">
+                    <span class="h-1.5 w-1.5 rounded-full bg-brand-500"></span>{{ \Illuminate\Support\Str::limit($m->release, 12) }}
+                    <span class="text-slate-500">{{ $m->first_seen }}</span>
+                </span>
+            @endforeach
+        </div>
+    @endif
+
     <div class="grid gap-4 md:grid-cols-3">
         <div class="rounded-xl bg-ink-850 p-4">
             <div class="mb-2 text-[11px] uppercase tracking-wider text-slate-500">Throughput</div>

@@ -34,6 +34,7 @@ class Requests extends Component
             'series' => $dashboard->requestSeries($project->id, $this->range),
             'routes' => $dashboard->topRoutes($project->id, $this->range, 50, false),
             'recent' => $dashboard->recentRequests($project->id, 60, $this->range, false),
+            'markers' => $dashboard->releaseMarkers($project->id, $this->range),
         ]);
     }
 }

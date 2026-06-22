@@ -8,6 +8,13 @@
         alerts under <a class="text-brand-400" href="{{ route('project.incidents', $project->slug) }}" wire:navigate>Incidents</a>.
     </flux:callout>
 
+    @if ($release !== '')
+        <div class="rounded-xl border border-brand-500/30 bg-ink-850 p-4">
+            <div class="text-[11px] uppercase tracking-wider text-slate-500">Since deploy {{ \Illuminate\Support\Str::limit($release, 16) }}</div>
+            <div class="mt-1 font-mono text-2xl font-semibold {{ $errors->isNotEmpty() ? 'text-rose-400' : 'text-white' }}">{{ number_format($errors->count()) }} failed requests</div>
+        </div>
+    @endif
+
     @if ($releases->isNotEmpty())
         <div class="flex flex-wrap gap-1">
             <button type="button" wire:click="$set('release', '')"

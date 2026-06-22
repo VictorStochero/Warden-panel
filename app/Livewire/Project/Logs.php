@@ -3,6 +3,7 @@
 namespace App\Livewire\Project;
 
 use App\Support\Ranges;
+use App\Support\ResolvesWindow;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -11,6 +12,8 @@ use VictorStochero\Warden\Dashboard\DashboardRepository;
 #[Layout('components.layouts.app')]
 class Logs extends Component
 {
+    use ResolvesWindow;
+
     public string $slug;
 
     #[Url]
@@ -42,6 +45,7 @@ class Logs extends Component
             $this->level = '';
         }
         $project = $dashboard->project($this->slug);
+        $this->applyWindow($dashboard);
 
         $level = $this->level;
         $needle = mb_strtolower(trim($this->q));

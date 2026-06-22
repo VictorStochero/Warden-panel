@@ -3,6 +3,7 @@
 namespace App\Livewire\Project;
 
 use App\Support\Ranges;
+use App\Support\ResolvesWindow;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -11,6 +12,8 @@ use VictorStochero\Warden\Dashboard\DashboardRepository;
 #[Layout('components.layouts.app')]
 class Show extends Component
 {
+    use ResolvesWindow;
+
     public string $slug;
 
     #[Url]
@@ -32,6 +35,7 @@ class Show extends Component
     {
         $this->range = Ranges::sanitize($this->range);
         $project = $dashboard->project($this->slug);
+        $this->applyWindow($dashboard);
 
         return view('livewire.project.show', [
             'project' => $project,

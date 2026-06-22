@@ -19,6 +19,14 @@ class Project extends Component
     public string $contact = '';
     public string $group = '';
     public string $tags = '';
+    public string $purgeTypeChoice = 'cache';
+    public string $confirmSlug = '';
+
+    /** @return list<string> */
+    public static function purgeTypes(): array
+    {
+        return ['query', 'exception', 'log', 'job', 'mail', 'notification', 'cache', 'command', 'schedule', 'http', 'request'];
+    }
 
     public function mount(string $slug): void
     {
@@ -55,8 +63,44 @@ class Project extends Component
         session()->flash('admin_project_saved', true);
     }
 
+    public function resetMetrics(ProjectManager $projects): void
+    {
+        $this->authorize('panel.manage');
+        $projects->resetMetrics($this->project());
+        $this->audit('panel.project.reset', $this->slug);
+        session()->flash('admin_project_saved', true);
+    }
+
+    public function purge(ProjectManager $projects): void
+    {
+        $this->authorize('panel.manage');
+        if (! in_array($this->purgeTypeChoice, self::purgeTypes(), true)) {
+            $this->purgeTypeChoice = 'cache';
+        }
+        $projects->purgeType($this->project(), $this->purgeTypeChoice);
+        $this->audit('panel.project.purge', $this->slug, ['type' => $this->purgeTypeChoice]);
+        session()->flash('admin_project_saved', true);
+    }
+
+    public function deleteProject(ProjectManager $projects)
+    {
+        $this->authorize('panel.manage');
+        if ($this->confirmSlug !== $this->slug) {
+            $this->addError('confirmSlug', 'Type the exact slug to confirm deletion.');
+
+            return null;
+        }
+        $projects->delete($this->project());
+        $this->audit('panel.project.delete', $this->slug);
+
+        return $this->redirect(route('admin.projects'), navigate: true);
+    }
+
     public function render()
     {
-        return view('livewire.admin.project', ['project' => $this->project()]);
+        return view('livewire.admin.project', [
+            'project' => $this->project(),
+            'purgeTypes' => self::purgeTypes(),
+        ]);
     }
 }

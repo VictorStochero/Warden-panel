@@ -19,4 +19,30 @@
             <div><flux:button type="submit" variant="primary">Save</flux:button></div>
         </form>
     </div>
+
+    <div class="rounded-xl border border-rose-500/40 bg-ink-850 p-6 space-y-4">
+        <flux:heading size="lg" class="text-rose-400">Danger zone</flux:heading>
+
+        <div class="flex flex-wrap items-end gap-3">
+            <flux:button wire:click="resetMetrics" wire:confirm="Delete all metrics for this project? Issues/incidents go too.">Reset metrics</flux:button>
+
+            <div class="flex items-end gap-2">
+                <flux:select wire:model="purgeTypeChoice" class="max-w-40">
+                    @foreach ($purgeTypes as $t)<flux:select.option value="{{ $t }}">{{ ucfirst($t) }}</flux:select.option>@endforeach
+                </flux:select>
+                <flux:button wire:click="purge" wire:confirm="Purge all stored events of this type?">Purge type</flux:button>
+            </div>
+        </div>
+
+        <flux:separator />
+
+        <div class="space-y-2">
+            <flux:subheading>Delete this project and all its data. Type <span class="font-mono">{{ $project->slug }}</span> to confirm.</flux:subheading>
+            <div class="flex items-end gap-2">
+                <flux:input wire:model="confirmSlug" class="max-w-xs" />
+                <flux:button variant="danger" wire:click="deleteProject">Delete project</flux:button>
+            </div>
+            <flux:error name="confirmSlug" />
+        </div>
+    </div>
 </div>

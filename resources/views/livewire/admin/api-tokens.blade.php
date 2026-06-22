@@ -1,6 +1,12 @@
 <div class="space-y-6">
     <flux:heading size="xl" class="font-wordmark">API tokens</flux:heading>
-    <flux:subheading>Read-only tokens for programmatic access. The plaintext is shown once.</flux:subheading>
+    <flux:subheading>Read-only tokens for the JSON fleet API. The plaintext is shown once.</flux:subheading>
+
+    <flux:callout variant="secondary">
+        Use a token with <span class="font-mono">Authorization: Bearer wdn_…</span> against
+        <span class="font-mono">/api/v1/overview</span>, <span class="font-mono">/api/v1/projects/{slug}</span>,
+        <span class="font-mono">/api/v1/projects/{slug}/events/{type}</span>.
+    </flux:callout>
 
     <form wire:submit="createToken" class="flex items-end gap-3">
         <flux:input wire:model="name" label="Token name" class="max-w-sm" />

@@ -49,6 +49,7 @@ class Events extends Component
         return view('livewire.project.events', [
             'project' => $project,
             'ranges' => Ranges::all(),
+            'kpis' => $dashboard->kpis($project->id, $this->range),
             'types' => self::types(),
             'events' => $dashboard->recentEvents($project->id, $this->type, 100, $this->range),
         ]);

@@ -1,11 +1,8 @@
 {{-- resources/views/livewire/project/database.blade.php --}}
 <div wire:poll.{{ config('panel.poll_seconds') }}s class="space-y-6">
-    <div class="flex items-center justify-between">
-        <flux:heading size="xl" class="font-wordmark">{{ $project->name }} · Database</flux:heading>
-        <flux:select wire:model.live="range" class="max-w-32">
-            @foreach ($ranges as $r)<flux:select.option value="{{ $r }}">{{ $r }}</flux:select.option>@endforeach
-        </flux:select>
-    </div>
+    <x-panel.banners :project="$project" />
+    <x-panel.page-header :title="$project->name . ' · Database'" :range="$range" :ranges="$ranges" />
+    <x-panel.kpi-strip :project="$project" :kpis="$kpis" />
 
     <div class="rounded-xl bg-ink-850 p-4">
         <flux:heading size="lg" class="mb-3">Query health</flux:heading>

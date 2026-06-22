@@ -30,6 +30,7 @@ class Http extends Component
         return view('livewire.project.http', [
             'project' => $project,
             'ranges' => Ranges::all(),
+            'kpis' => $dashboard->kpis($project->id, $this->range),
             'hosts' => $dashboard->httpHosts($project->id, $this->range),
         ]);
     }

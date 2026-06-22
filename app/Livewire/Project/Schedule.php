@@ -30,6 +30,7 @@ class Schedule extends Component
         return view('livewire.project.schedule', [
             'project' => $project,
             'ranges' => Ranges::all(),
+            'kpis' => $dashboard->kpis($project->id, $this->range),
             'tasks' => $dashboard->scheduleTasks($project->id, $this->range),
         ]);
     }

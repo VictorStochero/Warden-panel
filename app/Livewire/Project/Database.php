@@ -30,6 +30,7 @@ class Database extends Component
         return view('livewire.project.database', [
             'project' => $project,
             'ranges' => Ranges::all(),
+            'kpis' => $dashboard->kpis($project->id, $this->range),
             'slowQueries' => $dashboard->slowQueries($project->id, $this->range, 15),
             'frequentQueries' => $dashboard->frequentQueries($project->id, $this->range, 15),
             'queryHealth' => $dashboard->queryHealth($project->id, $this->range),

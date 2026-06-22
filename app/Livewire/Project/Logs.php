@@ -35,6 +35,7 @@ class Logs extends Component
         return view('livewire.project.logs', [
             'project' => $project,
             'ranges' => Ranges::all(),
+            'kpis' => $dashboard->kpis($project->id, $this->range),
             'logs' => $dashboard->recentEvents($project->id, 'log', 100, $this->range),
         ]);
     }

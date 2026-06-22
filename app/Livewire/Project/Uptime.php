@@ -23,6 +23,7 @@ class Uptime extends Component
 
         return view('livewire.project.uptime', [
             'project' => $project,
+            'kpis' => $dashboard->kpis($project->id, '24h'),
             'uptime' => $dashboard->uptime($project->id, '30d'),
             'windows' => $dashboard->uptimeWindows($project->id, '30d'),
             'incidents' => $dashboard->downtimeIncidents($project->id, 30, 50),

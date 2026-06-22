@@ -30,6 +30,7 @@ class Jobs extends Component
         return view('livewire.project.jobs', [
             'project' => $project,
             'ranges' => Ranges::all(),
+            'kpis' => $dashboard->kpis($project->id, $this->range),
             'queues' => $dashboard->queues($project->id, $this->range),
         ]);
     }

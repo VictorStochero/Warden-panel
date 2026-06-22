@@ -1,10 +1,7 @@
 <div wire:poll.{{ config('panel.poll_seconds') }}s class="space-y-6">
-    <div class="flex items-center justify-between">
-        <flux:heading size="xl" class="font-wordmark">{{ $project->name }} · Logs</flux:heading>
-        <flux:select wire:model.live="range" class="max-w-32">
-            @foreach ($ranges as $r)<flux:select.option value="{{ $r }}">{{ $r }}</flux:select.option>@endforeach
-        </flux:select>
-    </div>
+    <x-panel.banners :project="$project" />
+    <x-panel.page-header :title="$project->name . ' · Logs'" :range="$range" :ranges="$ranges" />
+    <x-panel.kpi-strip :project="$project" :kpis="$kpis" />
 
     <div class="rounded-xl bg-ink-850 p-4 space-y-1">
         @php($levelColor = ['error' => 'text-rose-400', 'critical' => 'text-rose-400', 'warning' => 'text-amber-400', 'info' => 'text-brand-400', 'debug' => 'text-slate-400'])

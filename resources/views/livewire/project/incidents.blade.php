@@ -1,5 +1,5 @@
 <div wire:poll.{{ config('panel.poll_seconds') }}s class="space-y-6">
-    <flux:heading size="xl" class="font-wordmark">{{ $project->name }} · Incidents</flux:heading>
+    <x-panel.page-header :title="$project->name . ' · Incidents'" :showRanges="false" />
 
     <div class="rounded-xl bg-ink-850 p-4">
         <flux:table>

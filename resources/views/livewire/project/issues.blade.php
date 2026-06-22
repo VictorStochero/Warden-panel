@@ -1,6 +1,7 @@
 <div wire:poll.{{ config('panel.poll_seconds') }}s class="space-y-6">
-    <div class="flex items-center justify-between">
-        <flux:heading size="xl" class="font-wordmark">{{ $project->name }} · Issues</flux:heading>
+    <x-panel.page-header :title="$project->name . ' · Issues'" :showRanges="false" />
+
+    <div class="flex justify-end">
         <flux:select wire:model.live="status" class="max-w-40">
             <flux:select.option value="open">Open</flux:select.option>
             <flux:select.option value="resolved">Resolved</flux:select.option>
